@@ -36,13 +36,29 @@ public class StoneHealth : MonoBehaviour
 
     void Die()
     {
-        // Efekt varsa oluþtur
+        // --- DÜZELTÝLEN KISIM BURASI ---
+        // Unity 6 için güncel arama kodu:
+        VehicleStackManager manager = Object.FindFirstObjectByType<VehicleStackManager>();
+
+        // Eðer yöneticiyi bulduysa parayý ekle
+        if (manager != null)
+        {
+            manager.AddMoney(10); // Her taþ 10 dolar kazandýrsýn
+        }
+
+        // Efekt ve Yok etme
         if (deathEffect != null)
         {
             Instantiate(deathEffect, transform.position, Quaternion.identity);
         }
 
-        // Taþý yok et
         Destroy(gameObject);
+    }
+
+    // Bu fonksiyonu StoneHealth class'ýnýn içine ekle
+    public void SetHealth(int maxHealth)
+    {
+        health = maxHealth;
+        UpdateText(); // Can deðiþtiði an üzerindeki yazýyý da güncelle
     }
 }
