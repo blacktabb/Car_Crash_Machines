@@ -107,7 +107,7 @@ public class VehicleStackManager : MonoBehaviour
         if (buyButtonText != null)
         {
             int price = GetCurrentPrice();
-            buyButtonText.text = "BUY\n" + price + " $";
+            buyButtonText.text = "BUY " + price + "$";
         }
     }
 
