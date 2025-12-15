@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 236133675}
   - component: {fileID: 236133674}
   - component: {fileID: 236133676}
+  - component: {fileID: 236133677}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -149,13 +150,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b10c6d6b2ec61045a880bac4712d452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stonePrefab: {fileID: 8382665648951138947, guid: e34ba199027f3a4489464250206f17de, type: 3}
-  spawnInterval: 3
-  spawnX: 12
-  groundY: -4
-  stoneHeight: 1
-  startHealth: 5
-  increaseAmount: 2
+  smallStone: {fileID: 8382665648951138947, guid: e34ba199027f3a4489464250206f17de, type: 3}
+  bigStone: {fileID: 3084620422983536547, guid: d0fadc44ea04cbe488d99b8433d46009, type: 3}
+  rows: 6
+  cellSize: 1
 --- !u!4 &236133675
 Transform:
   m_ObjectHideFlags: 0
@@ -165,7 +163,7 @@ Transform:
   m_GameObject: {fileID: 236133673}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.49, y: -0.7, z: 0}
+  m_LocalPosition: {x: -7.5, y: -2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -190,6 +188,19 @@ MonoBehaviour:
   basePrice: 50
   moneyText: {fileID: 2002523252}
   buyButtonText: {fileID: 1424325114}
+--- !u!114 &236133677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236133673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9839325c1b041f444a571361de4cba2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameSpeed: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,7 +670,7 @@ GameObject:
   - component: {fileID: 820680013}
   - component: {fileID: 820680012}
   - component: {fileID: 820680011}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -776,8 +787,8 @@ Transform:
   m_GameObject: {fileID: 820680010}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.41, y: -3.92, z: 0}
-  m_LocalScale: {x: 36.091408, y: 3.2625, z: 1}
+  m_LocalPosition: {x: 2.02, y: -4, z: 0}
+  m_LocalScale: {x: 36.091408, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

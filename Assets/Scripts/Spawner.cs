@@ -2,49 +2,101 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [Header("Spawn Ayarlarý")]
-    public GameObject stonePrefab;
-    public float spawnInterval = 3f;
-    public float spawnX = 12f;
-    public float groundY = -4f;
-    public float stoneHeight = 1f;
+    [Header("Prefablar")]
+    public GameObject smallStone;
+    public GameObject bigStone;
 
-    [Header("Zorluk (Difficulty)")]
-    public int startHealth = 5;          // Oyun baþýndaki taþ caný
-    public int increaseAmount = 2;       // Her spawn'da eklenecek can miktarý
+    [Header("Grid Ayarlarý")]
+    public int rows = 6;
+    public float cellSize = 1f;
 
-    private int spawnCount = 0;          // Kaçýncý dalgayý spawn ediyoruz?
+    // 'startY' deðiþkenini kaldýrdýk. Artýk transform.position.y kullanacaðýz.
+
+    private float spawnX;
+    private bool[] nextColumnReserved;
+    private float virtualCursorX;
 
     void Start()
     {
-        InvokeRepeating(nameof(SpawnTower), 1f, spawnInterval);
+        // 1. KAMERA SAÐ KENAR HESABI
+        float cameraHeight = 2f * Camera.main.orthographicSize;
+        float cameraWidth = cameraHeight * Camera.main.aspect;
+        spawnX = Camera.main.transform.position.x + (cameraWidth / 2f) + 2f;
+
+        nextColumnReserved = new bool[rows];
+        virtualCursorX = spawnX;
     }
 
-    void SpawnTower()
+    void Update()
     {
-        // 1. ZORLUK HESAPLAMA
-        // Formül: Baþlangýç + (Spawn Sayýsý * Artýþ Miktarý)
-        // Örn: 5 + (0*2)=5 -> 5 + (1*2)=7 -> 5 + (2*2)=9 ...
-        int currentDifficultyHealth = startHealth + (spawnCount * increaseAmount);
+        virtualCursorX -= GameManager.Instance.gameSpeed * Time.deltaTime;
 
-        // Kule yüksekliðini rastgele seç
-        int floorCount = Random.Range(1, 5);
-
-        for (int i = 0; i < floorCount; i++)
+        if (spawnX - virtualCursorX >= cellSize)
         {
-            Vector2 spawnPos = new Vector2(spawnX, groundY + (i * stoneHeight) + 0.5f);
+            SpawnColumn(spawnX);
+            virtualCursorX += cellSize;
+        }
+    }
 
-            GameObject newStone = Instantiate(stonePrefab, spawnPos, Quaternion.identity);
+    void SpawnColumn(float xPos)
+    {
+        bool[] currentColumnReserved = (bool[])nextColumnReserved.Clone();
+        for (int i = 0; i < rows; i++) nextColumnReserved[i] = false;
 
-            // 2. TAÞA YENÝ CAN DEÐERÝNÝ GÖNDER
-            StoneHealth healthScript = newStone.GetComponent<StoneHealth>();
-            if (healthScript != null)
+        // --- DEÐÝÞÝKLÝK BURADA: Baþlangýç noktasý objenin kendisi ---
+        float currentYBase = transform.position.y;
+
+        for (int y = 0; y < rows; y++)
+        {
+            if (currentColumnReserved[y]) continue;
+
+            bool canSpawnBig = (y < rows - 1) && !currentColumnReserved[y + 1];
+            bool chooseBig = canSpawnBig && (Random.value < 0.2f);
+
+            if (chooseBig)
             {
-                healthScript.SetHealth(currentDifficultyHealth);
+                SpawnBigStone(xPos, y, currentYBase); // Base Y'yi gönderiyoruz
+                currentColumnReserved[y + 1] = true;
+                nextColumnReserved[y] = true;
+                nextColumnReserved[y + 1] = true;
+            }
+            else
+            {
+                SpawnSmallStone(xPos, y, currentYBase);
             }
         }
+    }
 
-        // Bir sonraki dalga için sayacý artýr
-        spawnCount++;
+    // Fonksiyonlara 'baseY' parametresi ekledik
+    void SpawnSmallStone(float x, int yIndex, float baseY)
+    {
+        // startY yerine baseY kullanýyoruz
+        float yPos = baseY + (yIndex * cellSize);
+        Vector2 pos = new Vector2(x, yPos + (cellSize / 2f));
+        Instantiate(smallStone, pos, Quaternion.identity);
+    }
+
+    void SpawnBigStone(float x, int yIndex, float baseY)
+    {
+        float yPos = baseY + (yIndex * cellSize);
+        Vector2 pos = new Vector2(x + (cellSize * 0.5f), yPos + cellSize);
+        Instantiate(bigStone, pos, Quaternion.identity);
+    }
+
+    // GÖRSEL YARDIMCI (GÝZMO)
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        // Çizgi artýk transform.position.y hizasýndan baþlar
+        float lineY = transform.position.y + (cellSize / 2f);
+
+        Vector3 startLine = new Vector3(transform.position.x - 10, lineY, 0);
+        Vector3 endLine = new Vector3(transform.position.x + 20, lineY, 0);
+
+        Gizmos.DrawLine(startLine, endLine);
+
+        // Kutu
+        Gizmos.color = new Color(1, 0, 0, 0.3f);
+        Gizmos.DrawCube(new Vector3(transform.position.x, lineY, 0), new Vector3(cellSize, cellSize, 1));
     }
 }
