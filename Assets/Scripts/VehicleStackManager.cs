@@ -1,125 +1,212 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
-using TMPro; // UI ve Yazý iþlemleri için bu kütüphane ÞART!
+using UnityEngine.UI;
+using TMPro;
 
 public class VehicleStackManager : MonoBehaviour
 {
+    [Header("Oyun Durumu")]
+    public int maxHealth = 3;
+    private int currentHealth;
+    public bool isGameOver = false;
+
     [Header("Ayarlar")]
     public GameObject baseCarPrefab;
-    public float carHeight = 1.2f;
+    public float carHeight = 1.0f;
+    public int maxWeaponCount = 6;
 
     public List<VehicleWeapon> carStack = new List<VehicleWeapon>();
 
-    [Header("Ekonomi")]
+    [Header("Ekonomi & UI")]
     public int money = 1000;
     public int basePrice = 50;
+    public TextMeshProUGUI moneyText;
+    public TextMeshProUGUI buyButtonText;
+    public Button buyButtonComponent;
 
-    [Header("UI Baðlantýlarý")]
-    public TextMeshProUGUI moneyText; // Ekrandaki para yazýsý
-    public TextMeshProUGUI buyButtonText; // Butonun üzerindeki fiyat yazýsý
+    [Header("Hasar AyarÄ±")]
+    public float damageCooldown = 0.5f; // YarÄ±m saniye Ã¶lÃ¼msÃ¼zlÃ¼k
+    private float nextDamageTime = 0f;  // Bir sonraki hasar ne zaman alÄ±nabilir?
+
+    // --- CAN GÃ–STERGESÄ° Ä°Ã‡Ä°N ---
+    public TextMeshProUGUI healthText; // CanÄ± yazmak iÃ§in (Kalp emojisiyle)
 
     void Start()
     {
+        currentHealth = maxHealth; // CanÄ± fulle
+        UpdateHealthUI();
         SpawnCar();
-        UpdateUI(); // Oyun baþlar baþlamaz yazýlarý güncelle
     }
 
-    // Update fonksiyonundaki klavye kodlarýný sildim. Artýk buton kullanacaðýz.
-    // Ýstersen test için B ve M tuþlarýný geri ekleyebilirsin.
+    // --- Ã‡ARPIÅžMA ALGILAMA (TRIGGER) ---
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (isGameOver) return;
 
-    // --- BUTON ÝÇÝN SATIN ALMA ---
+        // --- DÃœZELTME BURADA ---
+        // EÄŸer ÅŸu an "Ã–lÃ¼msÃ¼zlÃ¼k" sÃ¼resindeysek, Ã§arpÄ±ÅŸmayÄ± yok say.
+        if (Time.time < nextDamageTime)
+        {
+            return;
+        }
+
+        if (other.CompareTag("Stone"))
+        {
+            // Bir sonraki hasar iÃ§in zamanÄ± ileriye atÄ±yoruz
+            nextDamageTime = Time.time + damageCooldown;
+
+            TakeDamage(other.gameObject);
+        }
+    }
+
+    void TakeDamage(GameObject stoneObj)
+    {
+        // 1. Can Azalt
+        currentHealth--;
+        UpdateHealthUI();
+
+        // 2. KRÄ°TÄ°K HAMLE: Ã‡arpan taÅŸÄ± ANINDA yok et.
+        // ClearColumn'u beklemeden, Ã§arpan o spesifik taÅŸÄ± sahneden siliyoruz.
+        // Ancak Ã¶nce pozisyonunu alalÄ±m ki sÃ¼tunu temizleyebilelim.
+        float hitX = stoneObj.transform.position.x;
+
+        Destroy(stoneObj); // <-- TaÅŸÄ± anÄ±nda yok et (GÃ¶rsel sorunu Ã§Ã¶zer)
+
+        // 3. SÃ¼tunu Temizle (ArkasÄ±ndan gelenleri yok et)
+        ClearColumn(hitX);
+
+        // 4. Oyun Bitti mi?
+        if (currentHealth <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    // TaÅŸa Ã§arptÄ±ÄŸÄ±mÄ±zda o hizadaki tÃ¼m taÅŸlarÄ± yok eden fonksiyon
+    // Eski ClearColumn yerine bunu yapÄ±ÅŸtÄ±r:
+    void ClearColumn(float collisionX)
+    {
+        // Tarama baÅŸlangÄ±Ã§ noktasÄ± (Ã‡arpÄ±ÅŸmanÄ±n olduÄŸu X, bizim Y)
+        Vector2 startPoint = new Vector2(collisionX, transform.position.y);
+
+        // --- DEÄžÄ°ÅžÄ°KLÄ°K BURADA: BoxCastAll ---
+        // Raycast (Ã‡izgi) yerine BoxCast (Kutu) atÄ±yoruz.
+        // Size: GeniÅŸliÄŸi 1.5f (Hafif geniÅŸ olsun ki saÄŸ solu da kapsasÄ±n), YÃ¼ksekliÄŸi 0.1f (Ã–nemsiz, yÃ¶nle uzayacak)
+        // Angle: 0
+        // Direction: YukarÄ± (Vector2.up)
+        // Distance: 20f (YukarÄ± kadar tara)
+
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(startPoint, new Vector2(1.5f, 0.1f), 0f, Vector2.up, 20f);
+
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider.CompareTag("Stone"))
+            {
+                // Efekt eklenebilir (Instantiate particle...)
+                Destroy(hit.collider.gameObject);
+            }
+        }
+    }
+
+    void GameOver()
+    {
+        isGameOver = true;
+        Debug.Log("OYUN BÄ°TTÄ°!");
+
+        // ZamanÄ± durdur
+        Time.timeScale = 0f;
+
+        // UI Ä°ÅŸlemleri (Ä°stersen burada Game Over paneli aÃ§abilirsin)
+        if (healthText != null) healthText.text = "GAME OVER";
+    }
+
+    void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            // Can sayÄ±sÄ± kadar Kalp koyalÄ±m
+            string hearts = "";
+            for (int i = 0; i < currentHealth; i++) hearts += "X ";
+            healthText.text = hearts;
+        }
+    }
+
+    // ... (BuyCar, MergeCars, SpawnCar, UpdatePositions, UpdateUI aynen kalacak) ...
+    // Sadece mevcut fonksiyonlarÄ±n altÄ±na yapÄ±ÅŸtÄ±rabilirsin veya class'Ä± koruyarak ekle.
+
+    // --- AÅžAÄžIDAKÄ°LER ESKÄ° KODLARIN AYNI KALACAK ---
     public void BuyCar()
     {
+        if (carStack.Count >= maxWeaponCount) return;
         int currentPrice = GetCurrentPrice();
-
         if (money >= currentPrice)
         {
             money -= currentPrice;
             SpawnCar();
-            UpdateUI(); // Para harcadýk, arayüzü güncelle
-        }
-        else
-        {
-            Debug.Log("Para Yetersiz!");
-            // Ýstersen burada "Yetersiz Bakiye" animasyonu oynatabilirsin
         }
     }
 
-    // --- BUTON ÝÇÝN MERGE ---
     public void MergeCars()
     {
         if (carStack.Count < 2) return;
-
-        bool merged = false;
-
         for (int i = 0; i < carStack.Count - 1; i++)
         {
             VehicleWeapon bottomCar = carStack[i];
             VehicleWeapon topCar = carStack[i + 1];
-
             if (bottomCar.level == topCar.level)
             {
                 bottomCar.LevelUp();
-                Destroy(topCar.gameObject);
+                topCar.DestroyWithAnimation();
                 carStack.RemoveAt(i + 1);
-
-                merged = true;
-                break; // Sadece bir tane birleþtir
+                UpdatePositions();
+                UpdateUI();
+                return;
             }
-        }
-
-        if (merged)
-        {
-            UpdatePositions();
-            UpdateUI(); // Fiyat deðiþmiþ olabilir (Araç sayýsý azaldý), güncelle
         }
     }
 
     void SpawnCar()
     {
         GameObject newCarObj = Instantiate(baseCarPrefab, transform);
-        newCarObj.transform.localPosition = Vector3.zero;
-
         VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();
         carStack.Add(newCarScript);
-
         UpdatePositions();
-        UpdateUI(); // Yeni araç geldi, fiyat arttý, güncelle
+        UpdateUI();
     }
 
     void UpdatePositions()
     {
         for (int i = 0; i < carStack.Count; i++)
         {
-            Vector3 targetPos = new Vector3(0, i * carHeight, 0);
-            carStack[i].transform.localPosition = targetPos;
+            float targetY = (i * carHeight) + (carHeight * 0.5f);
+            carStack[i].transform.localPosition = new Vector3(0, targetY, 0);
         }
     }
 
-    // --- YENÝ UI GÜNCELLEME FONKSÝYONU ---
     void UpdateUI()
     {
-        // 1. Parayý güncelle
-        if (moneyText != null)
-            moneyText.text = money.ToString() + " $";
-
-        // 2. Buton üzerindeki fiyatý güncelle
-        if (buyButtonText != null)
+        if (moneyText != null) moneyText.text = money.ToString() + " $";
+        if (buyButtonComponent != null && buyButtonText != null)
         {
-            int price = GetCurrentPrice();
-            buyButtonText.text = "BUY " + price + "$";
+            if (carStack.Count >= maxWeaponCount)
+            {
+                buyButtonText.text = "MAX";
+                buyButtonComponent.interactable = false;
+            }
+            else
+            {
+                int price = GetCurrentPrice();
+                buyButtonText.text = "BUY " + price + "$";
+                buyButtonComponent.interactable = true;
+            }
         }
     }
 
-    // Fiyat hesaplamayý ayrý fonksiyona aldým, her yerden çaðýrabilelim diye
     int GetCurrentPrice()
     {
-        // Araç sayýsý arttýkça fiyat artsýn
-        // Örn: 1. araç 50, 2. araç 100, 3. araç 150...
         return basePrice * (carStack.Count + 1);
     }
 
-    // CarStackManager içine ekle:
     public void AddMoney(int amount)
     {
         money += amount;
