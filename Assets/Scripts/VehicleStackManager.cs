@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class VehicleStackManager : MonoBehaviour
 {
@@ -24,9 +25,18 @@ public class VehicleStackManager : MonoBehaviour
     public TextMeshProUGUI buyButtonText;
     public Button buyButtonComponent;
 
+    [Header("UI")]
+    public GameObject gameOverPanel;
+
     [Header("Hasar Ayarı")]
     public float damageCooldown = 0.5f; // Yarım saniye ölümsüzlük
     private float nextDamageTime = 0f;  // Bir sonraki hasar ne zaman alınabilir?
+
+    [Header("Efektler")]
+    public GameObject hitParticlePrefab; // Duvara çarpma efekti
+    public CameraShake cameraShake; // Kamera titretme scripti
+    public float shakeDuration = 0.2f; // Ne kadar sürsün?
+    public float shakeMagnitude = 0.1f; // Ne kadar şiddetli olsun?
 
     // --- CAN GÖSTERGESİ İÇİN ---
     public TextMeshProUGUI healthText; // Canı yazmak için (Kalp emojisiyle)
@@ -61,21 +71,29 @@ public class VehicleStackManager : MonoBehaviour
 
     void TakeDamage(GameObject stoneObj)
     {
-        // 1. Can Azalt
+        // ... (currentHealth-- ve UpdateHealthUI() kodları burada kalacak) ...
         currentHealth--;
         UpdateHealthUI();
 
-        // 2. KRİTİK HAMLE: Çarpan taşı ANINDA yok et.
-        // ClearColumn'u beklemeden, çarpan o spesifik taşı sahneden siliyoruz.
-        // Ancak önce pozisyonunu alalım ki sütunu temizleyebilelim.
+        // --- YENİ EKLENEN EFEKTLER ---
+        // 1. Çarpma noktasında parçacık efekti oluştur
+        if (hitParticlePrefab != null)
+        {
+            // Taşın tam olduğu yerde efekti patlat
+            Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
+        }
+
+        // 2. Ekranı Titret
+        if (cameraShake != null)
+        {
+            cameraShake.TriggerShake(shakeDuration, shakeMagnitude);
+        }
+        // -----------------------------
+
         float hitX = stoneObj.transform.position.x;
-
-        Destroy(stoneObj); // <-- Taşı anında yok et (Görsel sorunu çözer)
-
-        // 3. Sütunu Temizle (Arkasından gelenleri yok et)
+        Destroy(stoneObj);
         ClearColumn(hitX);
 
-        // 4. Oyun Bitti mi?
         if (currentHealth <= 0)
         {
             GameOver();
@@ -113,11 +131,23 @@ public class VehicleStackManager : MonoBehaviour
         isGameOver = true;
         Debug.Log("OYUN BİTTİ!");
 
-        // Zamanı durdur
+        // 1. TİTREMEYİ DURDUR (Kamera yamuk kalmasın)
+        if (cameraShake != null)
+        {
+            cameraShake.StopShake();
+        }
+
+        // 2. PANELİ AÇ
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        // 3. OYUNU DURDUR
         Time.timeScale = 0f;
 
-        // UI İşlemleri (İstersen burada Game Over paneli açabilirsin)
-        if (healthText != null) healthText.text = "GAME OVER";
+        // (Eski text kodunu silebilirsin çünkü artık panelimiz var)
+        // if (healthText != null) healthText.text = "GAME OVER"; 
     }
 
     void UpdateHealthUI()
@@ -211,5 +241,11 @@ public class VehicleStackManager : MonoBehaviour
     {
         money += amount;
         UpdateUI();
+    }
+
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f; // Zamanı tekrar akıt
+        SceneManager.LoadScene("MainMenu");
     }
 }
