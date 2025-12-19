@@ -100,7 +100,7 @@ public class UpgradeManager : MonoBehaviour
         // ATK POWER (+20 DMG)
         // Lvl 4
         // Price: 300
-        txt.text = $"{title} <color=yellow>({currentStat})</color>\nLvl {lvl}\nPrice: {cost}";
+        txt.text = $"{title} <color=black>({currentStat})</color>\nLvl {lvl}\nPrice: {cost}";
     }
 
     public void ToggleShop()
