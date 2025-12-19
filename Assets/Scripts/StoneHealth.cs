@@ -1,28 +1,37 @@
 using UnityEngine;
-// Eðer UI veya TextMeshPro kullanacaksan kütüphaneyi ekle
 using TMPro;
 
 public class StoneHealth : MonoBehaviour
 {
-    public int health = 3; // Taþýn kaç vuruþta kýrýlacaðý
-    public GameObject deathEffect; // Taþ kýrýlýnca çýkacak efekt (Opsiyonel)
+    [Header("Ayarlar")]
+    public int currentHealth;
 
-    // Taþýn üzerine canýný yazmak istersen (TextMeshPro bileþeni varsa)
-    private TextMeshPro textDisplay;
+    // --- YENÝ DEÐÝÞKEN ---
+    private int goldValue; // Taþýn ödül deðeri (Baþlangýç canýna eþit olacak)
+    // ---------------------
 
-    void Start()
+    public TextMeshPro textMesh;
+    public GameObject deathEffect;
+
+    // Spawner bu fonksiyonu çaðýrýp taþa can veriyor
+    public void SetHealth(int amount)
     {
-        // Taþýn içinde TextMeshPro varsa onu bul
-        textDisplay = GetComponentInChildren<TextMeshPro>();
+        currentHealth = amount;
+
+        // --- EKLENEN KISIM ---
+        // Baþlangýç caný neyse, altýn deðeri de o olsun.
+        goldValue = amount;
+        // ---------------------
+
         UpdateText();
     }
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        currentHealth -= damage;
         UpdateText();
 
-        if (health <= 0)
+        if (currentHealth <= 0)
         {
             Die();
         }
@@ -30,25 +39,26 @@ public class StoneHealth : MonoBehaviour
 
     void UpdateText()
     {
-        if (textDisplay != null)
-            textDisplay.text = health.ToString();
+        if (textMesh != null)
+            textMesh.text = currentHealth.ToString();
     }
 
     void Die()
     {
-        // --- EKLENEN KISIM ---
-        // Level Manager'a ilerleme gönder (Her taþ 1 puan)
+        // Level Ýlerlemesi
         if (LevelManager.Instance != null)
         {
             LevelManager.Instance.AddProgress(1);
         }
-        // ---------------------
 
+        // --- PARA KAZANMA KISMI GÜNCELLENDÝ ---
         VehicleStackManager manager = Object.FindFirstObjectByType<VehicleStackManager>();
         if (manager != null)
         {
-            manager.AddMoney(10);
+            // Artýk sabit 10 deðil, taþýn 'goldValue' deðeri kadar para veriyoruz.
+            manager.AddMoney(goldValue);
         }
+        // ---------------------------------------
 
         if (deathEffect != null)
         {
@@ -56,12 +66,5 @@ public class StoneHealth : MonoBehaviour
         }
 
         Destroy(gameObject);
-    }
-
-    // Bu fonksiyonu StoneHealth class'ýnýn içine ekle
-    public void SetHealth(int maxHealth)
-    {
-        health = maxHealth;
-        UpdateText(); // Can deðiþtiði an üzerindeki yazýyý da güncelle
     }
 }

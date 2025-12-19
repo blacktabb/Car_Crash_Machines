@@ -3,7 +3,7 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class StoneMover : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    public float moveSpeed = 2f;
     private Rigidbody2D rb;
 
     void Start()

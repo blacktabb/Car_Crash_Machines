@@ -1,30 +1,32 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Sahne deðiþimi için þart
-using TMPro; // TextMeshPro için þart
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
     [Header("UI")]
-    public TextMeshProUGUI levelInfoText; // "Current Level: 5" yazýsý
+    public TextMeshProUGUI levelInfoText;
+    public TextMeshProUGUI totalGoldText; // --- YENÝ ---
 
     void Start()
     {
-        // 1. Kayýtlý Leveli Çek
-        // Eðer kayýt yoksa varsayýlan olarak 1 döner.
         int savedLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
+        int savedGold = PlayerPrefs.GetInt("TotalGold", 0); // --- YENÝ ---
 
-        // 2. Ekrana Yazdýr
         if (levelInfoText != null)
         {
             levelInfoText.text = "LEVEL " + savedLevel;
         }
+
+        // --- YENÝ ---
+        if (totalGoldText != null)
+        {
+            totalGoldText.text = savedGold.ToString() + " G"; // Yanýna G veya altýn ikonu koyabilirsin
+        }
     }
 
-    // PLAY Butonuna baðlayacaðýmýz fonksiyon
     public void PlayGame()
     {
-        // DÝKKAT: Oyun sahnennin adý neyse buraya aynýsýný yazmalýsýn.
-        // Senin ekran görüntünde "SampleScene" yazýyordu, o yüzden onu yazdým.
         SceneManager.LoadScene("SampleScene");
     }
 }

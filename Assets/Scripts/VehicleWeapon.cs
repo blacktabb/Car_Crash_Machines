@@ -1,44 +1,82 @@
 using UnityEngine;
 using TMPro;
-using System.Collections; // Coroutine için gerekli
+using System.Collections;
 
 public class VehicleWeapon : MonoBehaviour
 {
-    [Header("Özellikler")]
+    [Header("Temel Özellikler")]
     public int level = 1;
-    public int damage = 1;
-    public float fireRate = 0.5f;
-    private int tierIndex = 0;
+    public float baseDamage = 2f;
+    public float baseFireRate = 1.0f;
 
-    [Header("Görsel Ayarlar")]
-    public SpriteRenderer bodyRenderer;
-    public Transform firePoint;
+    [Header("Görseller & Referanslar")]
     public GameObject bulletPrefab;
+    public Transform firePoint;
+    public GameObject mergeEffect;
+    public Animator animator;
     public TextMeshPro levelText;
-    public Sprite[] levelSprites;
 
-    [Header("Animasyon")]
-    // Inspector'dan bu eðriyi ayarlayarak "Pop" efekti vereceðiz
-    public AnimationCurve spawnCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-    public float animDuration = 0.5f;
+    [Header("Animasyon Ayarlarý")]
+    public float mergeMoveSpeed = 15f;
 
-    private float nextFireTime;
+    private float nextFireTime = 0f;
 
     void Start()
     {
-        if (level > 0) tierIndex = (int)Mathf.Log(level, 2);
-        UpdateVisuals();
+        if (animator == null) animator = GetComponent<Animator>();
+        UpdateLevelText();
 
-        // Doðma Animasyonunu Baþlat
-        StartCoroutine(AnimateScale());
+        // --- YENÝ: DOÐMA ANÝMASYONUNU BAÞLAT ---
+        StartCoroutine(PlaySpawnAnimation());
+        // ---------------------------------------
     }
 
     void Update()
     {
+        HandleShooting();
+    }
+
+    // --- YENÝ EKLENEN POP-UP ANÝMASYONU ---
+    IEnumerator PlaySpawnAnimation()
+    {
+        // 1. Baþlangýçta görünmez (boyut 0) yap
+        transform.localScale = Vector3.zero;
+
+        float timer = 0f;
+        float duration = 0.3f; // Animasyon 0.3 saniye sürsün
+
+        // 2. Elastik Büyüme (Overshoot)
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float progress = timer / duration;
+
+            // "BackOut" Easing Fonksiyonu (Matematiksel Zýplama Efekti)
+            // Bu formül 0'dan baþlar, 1'i biraz geçer (þiþer) ve 1'e geri döner.
+            float c1 = 1.70158f;
+            float c3 = c1 + 1;
+            float scale = 1 + c3 * Mathf.Pow(progress - 1, 3) + c1 * Mathf.Pow(progress - 1, 2);
+
+            transform.localScale = Vector3.one * scale;
+            yield return null;
+        }
+
+        // 3. Garanti olsun diye en son 1'e sabitle
+        transform.localScale = Vector3.one;
+    }
+    // ----------------------------------------
+
+    void HandleShooting()
+    {
+        int spdUpgradeLevel = PlayerPrefs.GetInt("Upg_AtkSpeed", 0);
+        float reductionMultiplier = 1.0f - (spdUpgradeLevel * 0.02f) - ((level - 1) * 0.05f);
+        if (reductionMultiplier < 0.1f) reductionMultiplier = 0.1f;
+        float finalFireRate = baseFireRate * reductionMultiplier;
+
         if (Time.time >= nextFireTime)
         {
             Shoot();
-            nextFireTime = Time.time + fireRate;
+            nextFireTime = Time.time + finalFireRate;
         }
     }
 
@@ -47,100 +85,82 @@ public class VehicleWeapon : MonoBehaviour
         if (bulletPrefab != null && firePoint != null)
         {
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-            bullet.GetComponent<Bullet>().damage = damage;
+            BulletController bulletScript = bullet.GetComponent<BulletController>();
+
+            if (bulletScript != null)
+            {
+                int atkUpgradeLevel = PlayerPrefs.GetInt("Upg_AtkPower", 0);
+                float rawDamage = (baseDamage * level) + (atkUpgradeLevel * 5);
+
+                int critRateLvl = PlayerPrefs.GetInt("Upg_CritRate", 0);
+                int critDmgLvl = PlayerPrefs.GetInt("Upg_CritDmg", 0);
+                float critChance = 5.0f + (critRateLvl * 2.0f);
+                float critMultiplier = 1.5f + (critDmgLvl * 0.1f);
+                bool isCritical = (Random.Range(0f, 100f) < critChance);
+
+                if (isCritical)
+                {
+                    rawDamage *= critMultiplier;
+                    bullet.transform.localScale *= 1.3f;
+                    SpriteRenderer sr = bullet.GetComponent<SpriteRenderer>();
+                    if (sr != null) sr.color = Color.red;
+                }
+
+                bulletScript.SetDamage(Mathf.RoundToInt(rawDamage), isCritical);
+            }
         }
+    }
+
+    // --- BÝRLEÞME VE HAREKET FONKSÝYONLARI ---
+
+    public IEnumerator MoveAndMerge(Vector3 targetLocalPos)
+    {
+        while (Vector3.Distance(transform.localPosition, targetLocalPos) > 0.05f)
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetLocalPos, mergeMoveSpeed * Time.deltaTime);
+            yield return null;
+        }
+        transform.localPosition = targetLocalPos;
+
+        GetComponent<SpriteRenderer>().enabled = false;
+        if (levelText != null) levelText.enabled = false;
+    }
+
+    public IEnumerator SmoothMove(Vector3 targetLocalPos)
+    {
+        while (Vector3.Distance(transform.localPosition, targetLocalPos) > 0.05f)
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetLocalPos, mergeMoveSpeed * Time.deltaTime);
+            yield return null;
+        }
+        transform.localPosition = targetLocalPos;
     }
 
     public void LevelUp()
     {
         level *= 2;
-        tierIndex++;
-        damage *= 2;
-        fireRate *= 0.8f;
+        UpdateLevelText();
 
-        UpdateVisuals();
+        if (mergeEffect != null) Instantiate(mergeEffect, transform.position, Quaternion.identity);
+        if (animator != null) animator.SetTrigger("LevelUp");
 
-        // Seviye atlayýnca da animasyon oynasýn (Görsel geri bildirim)
-        StopAllCoroutines(); // Eski animasyon varsa durdur
-        StartCoroutine(AnimateScale());
+        // --- ÝSTEÐE BAÐLI: LEVEL ATLAYINCA DA HAFÝF ZIPLASIN ---
+        // StartCoroutine(PlaySpawnAnimation()); 
+        // Bunu açarsan level atladýðýnda da ayný pop-up efektini yapar.
     }
 
-    void UpdateVisuals()
+    void UpdateLevelText()
     {
-        if (bodyRenderer != null)
-        {
-            if (tierIndex < levelSprites.Length)
-            {
-                bodyRenderer.sprite = levelSprites[tierIndex];
-                bodyRenderer.color = Color.white;
-            }
-            else
-            {
-                bodyRenderer.sprite = levelSprites[levelSprites.Length - 1];
-                bodyRenderer.color = Color.HSVToRGB((tierIndex * 0.1f) % 1f, 1f, 1f);
-            }
-        }
-
         if (levelText != null) levelText.text = level.ToString();
     }
 
-    // --- BÜYÜME ANÝMASYONU ---
-    IEnumerator AnimateScale()
-    {
-        float timer = 0f;
-        Vector3 targetScale = Vector3.one; // Hedef boyut (1,1,1)
-
-        // Baþlangýçta boyutu 0 yapýyoruz
-        transform.localScale = Vector3.zero;
-
-        while (timer < 1f)
-        {
-            timer += Time.deltaTime / animDuration;
-
-            // Curve kullanarak deðer alýyoruz (0'dan 1'e giderken eðriye göre davranýr)
-            float scaleValue = spawnCurve.Evaluate(timer);
-
-            transform.localScale = targetScale * scaleValue;
-            yield return null;
-        }
-
-        // Garanti olsun diye döngü bitince tam boyuta eþitle
-        transform.localScale = targetScale;
-    }
-
-    // ... (Mevcut kodlarýn altýna ekle)
-
-    // Bu fonksiyonu dýþarýdan çaðýracaðýz
     public void DestroyWithAnimation()
     {
-        // Collider'ý kapat ki düþerken diðerlerine çarpmasýn
-        GetComponent<BoxCollider2D>().enabled = false;
-
-        // Varsa çalýþan animasyonlarý durdur
-        StopAllCoroutines();
-
-        // Yok olma animasyonunu baþlat
-        StartCoroutine(AnimateDeath());
-    }
-
-    IEnumerator AnimateDeath()
-    {
-        float timer = 0f;
-        float duration = 0.3f; // Çok hýzlý yok olsun (0.3 saniye)
-        Vector3 startScale = transform.localScale;
-
-        while (timer < 1f)
+        if (animator != null) animator.SetTrigger("MergeDestroy");
+        else
         {
-            timer += Time.deltaTime / duration;
-
-            // Lerp ile boyutu 1'den 0'a indiriyoruz
-            // Vector3.Lerp(Baþlangýç, Hedef, Zaman)
-            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, timer);
-
-            yield return null;
+            GetComponent<SpriteRenderer>().enabled = false;
+            if (levelText != null) levelText.enabled = false;
         }
-
-        // Animasyon bitti, artýk gerçekten yok edebiliriz
-        Destroy(gameObject);
     }
 }

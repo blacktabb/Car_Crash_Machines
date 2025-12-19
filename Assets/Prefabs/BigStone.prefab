@@ -105,7 +105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57a95d82a364e504cbd277e33e31f032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
+  currentHealth: 0
+  textMesh: {fileID: 4568897763194860832}
   deathEffect: {fileID: 6631328132968268246, guid: fe1d595400d82df49a4cc04de599ad86, type: 3}
 --- !u!114 &4265091135641335874
 MonoBehaviour:
@@ -119,7 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb1220128df4d9f4db6db9d7bd6fdab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 2
 --- !u!61 &7928240090765805973
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class VehicleStackManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class VehicleStackManager : MonoBehaviour
     public int maxHealth = 3;
     private int currentHealth;
     public bool isGameOver = false;
+    private bool isMerging = false;
 
     [Header("Ayarlar")]
     public GameObject baseCarPrefab;
@@ -18,109 +20,110 @@ public class VehicleStackManager : MonoBehaviour
 
     public List<VehicleWeapon> carStack = new List<VehicleWeapon>();
 
-    [Header("Ekonomi & UI")]
+    [Header("Ekonomi")]
     public int money = 1000;
+    public int currentLevelMoney = 150;
+
+    [Header("Satın Alma Ayarları")]
     public int basePrice = 50;
-    public TextMeshProUGUI moneyText;
     public TextMeshProUGUI buyButtonText;
     public Button buyButtonComponent;
 
-    [Header("UI")]
+    [Header("Merge (Birleştirme) Ayarları")]
+    public int mergeBasePrice = 50; // Başlangıç fiyatı
+    public int mergePriceIncreaseAmount = 2; // Her kullanımda +2 coin ekle
+    private int mergeCount = 0;
+
+    public TextMeshProUGUI mergeButtonText;
+    public Button mergeButtonComponent;
+
+    [Header("UI Genel")]
+    public TextMeshProUGUI moneyText;
     public GameObject gameOverPanel;
+    public TextMeshProUGUI healthText;
 
     [Header("Hasar Ayarı")]
-    public float damageCooldown = 0.5f; // Yarım saniye ölümsüzlük
-    private float nextDamageTime = 0f;  // Bir sonraki hasar ne zaman alınabilir?
+    public float damageCooldown = 0.5f;
+    private float nextDamageTime = 0f;
 
     [Header("Efektler")]
-    public GameObject hitParticlePrefab; // Duvara çarpma efekti
-    public CameraShake cameraShake; // Kamera titretme scripti
-    public float shakeDuration = 0.2f; // Ne kadar sürsün?
-    public float shakeMagnitude = 0.1f; // Ne kadar şiddetli olsun?
-
-    // --- CAN GÖSTERGESİ İÇİN ---
-    public TextMeshProUGUI healthText; // Canı yazmak için (Kalp emojisiyle)
+    public GameObject hitParticlePrefab;
+    public CameraShake cameraShake;
+    public float shakeDuration = 0.2f;
+    public float shakeMagnitude = 0.1f;
 
     void Start()
     {
-        currentHealth = maxHealth; // Canı fulle
-        UpdateHealthUI();
-        SpawnCar();
+        // --- DEĞİŞİKLİK BURADA ---
+        // Eskiden: currentHealth = maxHealth;
+
+        // Şimdi: Hafızadan HP Levelini oku
+        int hpLevel = PlayerPrefs.GetInt("Upg_MaxHealth", 0);
+
+        // Yeni Max Health = Baz Can + Upgrade Leveli
+        // Örn: Baz 3 + Level 2 = 5 Can
+        int finalMaxHealth = maxHealth + hpLevel;
+
+        currentHealth = finalMaxHealth;
+        // -------------------------
+
+        money = currentLevelMoney;
+        mergeCount = 0;
+
+        UpdateHealthUI(); // Kalpleri ekrana bas
+        SpawnWeapon();
+        UpdateUI();
     }
 
-    // --- ÇARPIŞMA ALGILAMA (TRIGGER) ---
     void OnTriggerEnter2D(Collider2D other)
     {
         if (isGameOver) return;
 
-        // --- DÜZELTME BURADA ---
-        // Eğer şu an "Ölümsüzlük" süresindeysek, çarpışmayı yok say.
-        if (Time.time < nextDamageTime)
-        {
-            return;
-        }
-
         if (other.CompareTag("Stone"))
         {
-            // Bir sonraki hasar için zamanı ileriye atıyoruz
-            nextDamageTime = Time.time + damageCooldown;
+            if (Time.time < nextDamageTime)
+            {
+                if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
 
+                float hitX = other.transform.position.x;
+                if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, other.transform.position, Quaternion.identity);
+
+                Destroy(other.gameObject);
+                ClearColumn(hitX);
+                return;
+            }
+
+            nextDamageTime = Time.time + damageCooldown;
             TakeDamage(other.gameObject);
         }
     }
 
     void TakeDamage(GameObject stoneObj)
     {
-        // ... (currentHealth-- ve UpdateHealthUI() kodları burada kalacak) ...
         currentHealth--;
         UpdateHealthUI();
 
-        // --- YENİ EKLENEN EFEKTLER ---
-        // 1. Çarpma noktasında parçacık efekti oluştur
-        if (hitParticlePrefab != null)
-        {
-            // Taşın tam olduğu yerde efekti patlat
-            Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
-        }
-
-        // 2. Ekranı Titret
-        if (cameraShake != null)
-        {
-            cameraShake.TriggerShake(shakeDuration, shakeMagnitude);
-        }
-        // -----------------------------
+        if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
+        if (cameraShake != null) cameraShake.TriggerShake(shakeDuration, shakeMagnitude);
+        if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
 
         float hitX = stoneObj.transform.position.x;
         Destroy(stoneObj);
         ClearColumn(hitX);
 
-        if (currentHealth <= 0)
-        {
-            GameOver();
-        }
+        if (currentHealth <= 0) GameOver();
     }
 
-    // Taşa çarptığımızda o hizadaki tüm taşları yok eden fonksiyon
-    // Eski ClearColumn yerine bunu yapıştır:
     void ClearColumn(float collisionX)
     {
-        // Tarama başlangıç noktası (Çarpışmanın olduğu X, bizim Y)
         Vector2 startPoint = new Vector2(collisionX, transform.position.y);
-
-        // --- DEĞİŞİKLİK BURADA: BoxCastAll ---
-        // Raycast (Çizgi) yerine BoxCast (Kutu) atıyoruz.
-        // Size: Genişliği 1.5f (Hafif geniş olsun ki sağ solu da kapsasın), Yüksekliği 0.1f (Önemsiz, yönle uzayacak)
-        // Angle: 0
-        // Direction: Yukarı (Vector2.up)
-        // Distance: 20f (Yukarı kadar tara)
-
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(startPoint, new Vector2(1.5f, 0.1f), 0f, Vector2.up, 20f);
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(startPoint, new Vector2(3f, 0.1f), 0f, Vector2.up, 20f);
 
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.collider.CompareTag("Stone"))
             {
-                // Efekt eklenebilir (Instantiate particle...)
+                if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
                 Destroy(hit.collider.gameObject);
             }
         }
@@ -129,73 +132,106 @@ public class VehicleStackManager : MonoBehaviour
     void GameOver()
     {
         isGameOver = true;
-        Debug.Log("OYUN BİTTİ!");
-
-        // 1. TİTREMEYİ DURDUR (Kamera yamuk kalmasın)
-        if (cameraShake != null)
-        {
-            cameraShake.StopShake();
-        }
-
-        // 2. PANELİ AÇ
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
-
-        // 3. OYUNU DURDUR
+        if (cameraShake != null) cameraShake.StopShake();
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
-
-        // (Eski text kodunu silebilirsin çünkü artık panelimiz var)
-        // if (healthText != null) healthText.text = "GAME OVER"; 
     }
 
     void UpdateHealthUI()
     {
         if (healthText != null)
         {
-            // Can sayısı kadar Kalp koyalım
             string hearts = "";
             for (int i = 0; i < currentHealth; i++) hearts += "X ";
             healthText.text = hearts;
         }
     }
 
-    // ... (BuyCar, MergeCars, SpawnCar, UpdatePositions, UpdateUI aynen kalacak) ...
-    // Sadece mevcut fonksiyonların altına yapıştırabilirsin veya class'ı koruyarak ekle.
-
-    // --- AŞAĞIDAKİLER ESKİ KODLARIN AYNI KALACAK ---
-    public void BuyCar()
+    public void BuyWeapon()
     {
+        if (isMerging) return;
+
         if (carStack.Count >= maxWeaponCount) return;
         int currentPrice = GetCurrentPrice();
         if (money >= currentPrice)
         {
             money -= currentPrice;
-            SpawnCar();
+            SpawnWeapon();
         }
     }
 
-    public void MergeCars()
+    public void MergeWeapons()
     {
-        if (carStack.Count < 2) return;
+        if (isMerging || carStack.Count < 2) return;
+
+        int mergeCost = GetNextMergeCost();
+
+        if (HasMergeablePair())
+        {
+            if (money >= mergeCost)
+            {
+                money -= mergeCost;
+                mergeCount++; // Sayacı artır
+                StartCoroutine(MergeProcess());
+            }
+            else
+            {
+                Debug.Log("Merge için para yetersiz!");
+            }
+        }
+        else
+        {
+            Debug.Log("Birleşecek uygun silah yok!");
+        }
+    }
+
+    IEnumerator MergeProcess()
+    {
         for (int i = 0; i < carStack.Count - 1; i++)
         {
             VehicleWeapon bottomCar = carStack[i];
             VehicleWeapon topCar = carStack[i + 1];
+
             if (bottomCar.level == topCar.level)
             {
+                isMerging = true;
+
+                // 1. ÖNCE DİĞERLERİNİ KAYDIR (Beklemeden başlat)
+                // Üstteki araçların kaymasını başlatıyoruz ki hepsi aynı anda hareket etsin.
+                for (int k = i + 2; k < carStack.Count; k++)
+                {
+                    VehicleWeapon upperCar = carStack[k];
+                    float targetY = ((k - 1) * carHeight) + (carHeight * 0.5f);
+                    Vector3 targetLocalPos = new Vector3(0, targetY, 0);
+
+                    StartCoroutine(upperCar.SmoothMove(targetLocalPos));
+                }
+
+                // 2. BİRLEŞEN SİLAHI GÖNDER VE HAREKETİN BİTMESİNİ BEKLE
+                // WaitForSeconds(0.4f) YERİNE bunu kullanıyoruz.
+                // Bu kod şu anlama gelir: "TopCar hedefe varana kadar bekle, varınca hemen devam et."
+                yield return StartCoroutine(topCar.MoveAndMerge(bottomCar.transform.localPosition));
+
+                // 3. HAREKET BİTTİĞİ GİBİ LEVEL ATLAT (Gecikme Yok)
                 bottomCar.LevelUp();
-                topCar.DestroyWithAnimation();
+
+                // Üstteki silahı temizle
+                if (topCar != null && topCar.gameObject != null)
+                {
+                    Destroy(topCar.gameObject);
+                }
+
                 carStack.RemoveAt(i + 1);
                 UpdatePositions();
+
+                isMerging = false;
                 UpdateUI();
-                return;
+                yield break;
             }
         }
     }
 
-    void SpawnCar()
+    void SpawnWeapon()
     {
         GameObject newCarObj = Instantiate(baseCarPrefab, transform);
         VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();
@@ -216,6 +252,7 @@ public class VehicleStackManager : MonoBehaviour
     void UpdateUI()
     {
         if (moneyText != null) moneyText.text = money.ToString() + " $";
+
         if (buyButtonComponent != null && buyButtonText != null)
         {
             if (carStack.Count >= maxWeaponCount)
@@ -227,14 +264,53 @@ public class VehicleStackManager : MonoBehaviour
             {
                 int price = GetCurrentPrice();
                 buyButtonText.text = "BUY " + price + "$";
-                buyButtonComponent.interactable = true;
+                buyButtonComponent.interactable = (money >= price);
+            }
+        }
+
+        if (mergeButtonComponent != null && mergeButtonText != null)
+        {
+            int mergeCost = GetNextMergeCost();
+            bool canMerge = HasMergeablePair();
+
+            if (canMerge)
+            {
+                mergeButtonText.text = "MERGE " + mergeCost + "$";
+                mergeButtonComponent.interactable = (money >= mergeCost) && !isMerging;
+            }
+            else
+            {
+                mergeButtonText.text = "NO MERGE";
+                mergeButtonComponent.interactable = false;
             }
         }
     }
 
+    // --- FİYAT HESAPLAMALARI ---
+
     int GetCurrentPrice()
     {
         return basePrice * (carStack.Count + 1);
+    }
+
+    // --- YENİ DOĞRUSAL HESAPLAMA ---
+    int GetNextMergeCost()
+    {
+        // 50 + (Sayaç * 2)
+        return mergeBasePrice + (mergeCount * mergePriceIncreaseAmount);
+    }
+
+    bool HasMergeablePair()
+    {
+        if (carStack.Count < 2) return false;
+        for (int i = 0; i < carStack.Count - 1; i++)
+        {
+            if (carStack[i].level == carStack[i + 1].level)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void AddMoney(int amount)
@@ -245,7 +321,7 @@ public class VehicleStackManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        Time.timeScale = 1f; // Zamanı tekrar akıt
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 }

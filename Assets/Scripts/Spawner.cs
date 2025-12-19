@@ -37,9 +37,10 @@ public class Spawner : MonoBehaviour
     {
         CalculateCameraBounds();
         nextColumnReserved = new bool[rows];
-
-        // Oyuna baþladýðýmýzda (veya level yüklendiðinde) sayacý sýfýrla
         ResetSpawner();
+
+        // NOT: Spawner artýk zorluðu LevelManager'dan dinamik alacak.
+        // O yüzden buradaki difficultyOffset mantýðýný biraz deðiþtireceðiz.
     }
 
     void CalculateCameraBounds()
@@ -144,35 +145,55 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    void SpawnSmallStone(float x, int yIndex, float baseY, int health)
+    void SpawnSmallStone(float x, int yIndex, float baseY, int baseHealth)
     {
         float yPos = baseY + (yIndex * cellSize);
         Vector2 pos = new Vector2(x, yPos + (cellSize / 2f));
         GameObject stone = Instantiate(smallStone, pos, Quaternion.identity);
-        stone.GetComponent<StoneHealth>().SetHealth(health);
 
-        // SAYACI ARTIR
+        // --- ZORLUK HESAPLAMA ---
+        int multiplier = 1;
+        if (LevelManager.Instance != null)
+        {
+            multiplier = LevelManager.Instance.GetHealthMultiplier();
+        }
+
+        // Gelen random baseHealth (örn: 2 ile 6 arasý) * Level Çarpaný
+        int finalHealth = baseHealth * multiplier;
+        // ------------------------
+
+        stone.GetComponent<StoneHealth>().SetHealth(finalHealth);
         totalSpawnedStones++;
     }
 
-    void SpawnBigStone(float x, int yIndex, float baseY, int health)
+    void SpawnBigStone(float x, int yIndex, float baseY, int baseHealth)
     {
         float yPos = baseY + (yIndex * cellSize);
         Vector2 pos = new Vector2(x + (cellSize * 0.5f), yPos + cellSize);
         GameObject stone = Instantiate(bigStone, pos, Quaternion.identity);
-        stone.GetComponent<StoneHealth>().SetHealth(health);
 
-        // SAYACI ARTIR (Büyük taþ da 1 puan sayýlýyor)
+        // --- ZORLUK HESAPLAMA ---
+        int multiplier = 1;
+        if (LevelManager.Instance != null)
+        {
+            multiplier = LevelManager.Instance.GetHealthMultiplier();
+        }
+
+        int finalHealth = baseHealth * multiplier;
+        // ------------------------
+
+        stone.GetComponent<StoneHealth>().SetHealth(finalHealth);
         totalSpawnedStones++;
     }
 
     void UpdateDifficultyUI()
     {
-        if (difficultyText != null)
+        if (difficultyText != null && LevelManager.Instance != null)
         {
-            int currentMin = smallRange.x + difficultyOffset;
-            int currentMax = smallRange.y + difficultyOffset;
-            difficultyText.text = $"Zone HP: {currentMin} - {currentMax}";
+            int multiplier = LevelManager.Instance.GetHealthMultiplier();
+            int min = smallRange.x * multiplier;
+            int max = smallRange.y * multiplier;
+            difficultyText.text = $"Zone HP: {min} - {max}";
         }
     }
 }
