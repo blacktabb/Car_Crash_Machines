@@ -25,9 +25,10 @@ public class LevelManager : MonoBehaviour
     public float maxGameSpeed = 3.0f;
 
     [Header("Ekonomi (Level Sonu Bonusu)")]
-    public int baseGoldReward = 100;
-    public int goldPerLevel = 10;
-    public TextMeshProUGUI earnedGoldText;
+    public LevelRewardManager rewardManager; // Inspector'dan ata
+    public int playerCurrentHealth; // Oyuncunun o anki caný
+    public int playerMaxHealth;     // Oyuncunun maks caný
+    public int currentLevelIndex;   // Þu anki level sayýsý
 
     [Header("UI Panelleri")]
     public Slider progressBar;         // Dolum çubuðu
@@ -86,8 +87,8 @@ public class LevelManager : MonoBehaviour
         if (winPanel != null) winPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
-        if (nextLevelInfoText != null) nextLevelInfoText.text = "LEVEL " + (currentLevel + 1);
-        if (retryLevelInfoText != null) retryLevelInfoText.text = "LEVEL " + currentLevel;
+        if (nextLevelInfoText != null) nextLevelInfoText.text = (currentLevel + 1).ToString();
+        if (retryLevelInfoText != null) retryLevelInfoText.text = currentLevel.ToString();
     }
 
     void Update()
@@ -183,17 +184,7 @@ public class LevelManager : MonoBehaviour
     }
 
     void LevelComplete()
-    {
-        int levelBonus = baseGoldReward + (currentLevel * goldPerLevel);
-
-        if (VehicleStackManager.Instance != null)
-        {
-            VehicleStackManager.Instance.AddMoney(levelBonus);
-        }
-
-        if (earnedGoldText != null)
-            earnedGoldText.text = "+" + levelBonus + " GOLD (Bonus)";
-
+    {     
         PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
         PlayerPrefs.Save();
 
