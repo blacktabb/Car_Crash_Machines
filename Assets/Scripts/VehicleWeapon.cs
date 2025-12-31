@@ -9,6 +9,11 @@ public class VehicleWeapon : MonoBehaviour
     public float baseDamage = 2f;
     public float baseFireRate = 1.0f;
 
+    [Header("Merge Dengesi (YENÝ)")]
+    // 1.5 = Her merge iþleminde %50 güçlenir (Tavsiye edilen: 1.2 ile 1.5 arasý)
+    // 2.0 yaparsan eski sistemle ayný olur (%100 artýþ).
+    public float damageMultiplierPerMerge = 1.20f;
+
     [Header("Görseller & Referanslar")]
     public GameObject bulletPrefab;
     public Transform firePoint;
@@ -18,17 +23,19 @@ public class VehicleWeapon : MonoBehaviour
 
     [Header("Animasyon Ayarlarý")]
     public float mergeMoveSpeed = 15f;
-
     private float nextFireTime = 0f;
+
+    // Geçici Güçlendirmeler
+    [HideInInspector] public float tempDamageMultiplier = 1.0f;
+    [HideInInspector] public float tempFireRateDivider = 1.0f;
+    [HideInInspector] public float tempCritChanceAdd = 0f;
 
     void Start()
     {
-        if (animator == null) animator = GetComponent<Animator>();
+        if (level <= 0) level = 1;
+        UpdateVisuals();
         UpdateLevelText();
-
-        // --- YENÝ: DOÐMA ANÝMASYONUNU BAÞLAT ---
         StartCoroutine(PlaySpawnAnimation());
-        // ---------------------------------------
     }
 
     void Update()
@@ -36,82 +43,120 @@ public class VehicleWeapon : MonoBehaviour
         HandleShooting();
     }
 
-    // --- YENÝ EKLENEN POP-UP ANÝMASYONU ---
-    IEnumerator PlaySpawnAnimation()
+    // ... (UpdateVisuals ve HandleShooting Hýz kýsýmlarý ayný kalýyor) ...
+
+    public void UpdateVisuals()
     {
-        // 1. Baþlangýçta görünmez (boyut 0) yap
-        transform.localScale = Vector3.zero;
+        if (VehicleStackManager.Instance == null || VehicleStackManager.Instance.weaponModels == null) return;
 
-        float timer = 0f;
-        float duration = 0.3f; // Animasyon 0.3 saniye sürsün
+        Transform oldModel = transform.Find("ActiveWeaponModel");
+        if (oldModel != null) Destroy(oldModel.gameObject);
 
-        // 2. Elastik Büyüme (Overshoot)
-        while (timer < duration)
+        int modelIndex = (level == 1) ? 0 : (int)Mathf.Log(level, 2);
+        if (modelIndex >= VehicleStackManager.Instance.weaponModels.Length)
+            modelIndex = VehicleStackManager.Instance.weaponModels.Length - 1;
+
+        GameObject targetPrefab = VehicleStackManager.Instance.weaponModels[modelIndex];
+
+        if (targetPrefab != null)
         {
-            timer += Time.deltaTime;
-            float progress = timer / duration;
-
-            // "BackOut" Easing Fonksiyonu (Matematiksel Zýplama Efekti)
-            // Bu formül 0'dan baþlar, 1'i biraz geçer (þiþer) ve 1'e geri döner.
-            float c1 = 1.70158f;
-            float c3 = c1 + 1;
-            float scale = 1 + c3 * Mathf.Pow(progress - 1, 3) + c1 * Mathf.Pow(progress - 1, 2);
-
-            transform.localScale = Vector3.one * scale;
-            yield return null;
+            GameObject newModel = Instantiate(targetPrefab, transform);
+            newModel.name = "ActiveWeaponModel";
+            newModel.transform.localPosition = Vector3.zero;
+            newModel.transform.localRotation = Quaternion.identity;
+            newModel.transform.localScale = Vector3.one;
+            animator = newModel.GetComponent<Animator>();
         }
-
-        // 3. Garanti olsun diye en son 1'e sabitle
-        transform.localScale = Vector3.one;
+        UpdateLevelText();
     }
-    // ----------------------------------------
 
     void HandleShooting()
     {
-        int spdUpgradeLevel = PlayerPrefs.GetInt("Upg_AtkSpeed", 0);
-        float reductionMultiplier = 1.0f - (spdUpgradeLevel * 0.02f) - ((level - 1) * 0.05f);
-        if (reductionMultiplier < 0.1f) reductionMultiplier = 0.1f;
-        float finalFireRate = baseFireRate * reductionMultiplier;
+        // HIZ HESABI (Aynen Kalýyor)
+        float bonusSpeed = 0f;
+        if (UpgradeManager.Instance != null)
+        {
+            int spdLvl = PlayerPrefs.GetInt("Upg_AtkSpeed", 0);
+            bonusSpeed = spdLvl * UpgradeManager.Instance.incValue_Spd;
+        }
+
+        float levelBonus = (level - 1) * 0.1f;
+        float totalFireRate = baseFireRate + bonusSpeed + levelBonus;
+        totalFireRate /= tempFireRateDivider;
+        float fireDelay = 1.0f / totalFireRate;
 
         if (Time.time >= nextFireTime)
         {
             Shoot();
-            nextFireTime = Time.time + finalFireRate;
+            nextFireTime = Time.time + fireDelay;
         }
     }
 
     void Shoot()
     {
-        if (bulletPrefab != null && firePoint != null)
+        if (bulletPrefab == null || firePoint == null) return;
+
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        BulletController bulletScript = bullet.GetComponent<BulletController>();
+
+        if (bulletScript != null)
         {
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-            BulletController bulletScript = bullet.GetComponent<BulletController>();
+            // --- YENÝ HASAR HESABI ---
 
-            if (bulletScript != null)
+            // 1. Upgrade'den gelen sabit hasarý al
+            float bonusDamage = 0f;
+            if (UpgradeManager.Instance != null)
             {
-                int atkUpgradeLevel = PlayerPrefs.GetInt("Upg_AtkPower", 0);
-                float rawDamage = (baseDamage * level) + (atkUpgradeLevel * 5);
+                int atkLvl = PlayerPrefs.GetInt("Upg_AtkPower", 0);
+                bonusDamage = atkLvl * UpgradeManager.Instance.incValue_Atk;
+            }
 
+            // 2. MERGE GÜCÜNÜ HESAPLA (Üstel Artýþ)
+            // Level 1 -> tier 0
+            // Level 2 -> tier 1
+            // Level 4 -> tier 2
+            float tierIndex = Mathf.Log(level, 2); // Kaçýncý seviye olduðunu bul (0, 1, 2, 3...)
+
+            // Çarpaný hesapla: 1.3 ^ 2 gibi
+            float mergeMultiplier = Mathf.Pow(damageMultiplierPerMerge, tierIndex);
+
+            // FORMÜL: (BazHasar * MergeÇarpaný) + UpgradeBonusu
+            float finalDamage = (baseDamage * mergeMultiplier) + bonusDamage;
+
+            // -------------------------
+
+            // Perk Çarpaný
+            finalDamage *= tempDamageMultiplier;
+
+            // --- KRÝTÝK HESABI (Ayný Kalýyor) ---
+            float critChance = 5.0f;
+            float critMult = 1.5f;
+
+            if (UpgradeManager.Instance != null)
+            {
                 int critRateLvl = PlayerPrefs.GetInt("Upg_CritRate", 0);
                 int critDmgLvl = PlayerPrefs.GetInt("Upg_CritDmg", 0);
-                float critChance = 5.0f + (critRateLvl * 2.0f);
-                float critMultiplier = 1.5f + (critDmgLvl * 0.1f);
-                bool isCritical = (Random.Range(0f, 100f) < critChance);
 
-                if (isCritical)
-                {
-                    rawDamage *= critMultiplier;
-                    bullet.transform.localScale *= 1.3f;
-                    SpriteRenderer sr = bullet.GetComponent<SpriteRenderer>();
-                    if (sr != null) sr.color = Color.red;
-                }
+                critChance += (critRateLvl * UpgradeManager.Instance.incValue_CritRate);
+                critMult += (critDmgLvl * UpgradeManager.Instance.incValue_CritDmg);
+            }
 
-                bulletScript.SetDamage(Mathf.RoundToInt(rawDamage), isCritical);
+            critChance += tempCritChanceAdd;
+
+            bool isCritical = (Random.Range(0f, 100f) < critChance);
+            if (isCritical) finalDamage *= critMult;
+
+            // Virgüllü hasarý gönder
+            bulletScript.SetDamage(finalDamage, isCritical);
+
+            if (isCritical)
+            {
+                bullet.transform.localScale *= 1.3f;
+                Renderer rnd = bullet.GetComponent<Renderer>();
+                if (rnd != null) rnd.material.color = Color.red;
             }
         }
     }
-
-    // --- BÝRLEÞME VE HAREKET FONKSÝYONLARI ---
 
     public IEnumerator MoveAndMerge(Vector3 targetLocalPos)
     {
@@ -121,32 +166,14 @@ public class VehicleWeapon : MonoBehaviour
             yield return null;
         }
         transform.localPosition = targetLocalPos;
-
-        GetComponent<SpriteRenderer>().enabled = false;
-        if (levelText != null) levelText.enabled = false;
-    }
-
-    public IEnumerator SmoothMove(Vector3 targetLocalPos)
-    {
-        while (Vector3.Distance(transform.localPosition, targetLocalPos) > 0.05f)
-        {
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetLocalPos, mergeMoveSpeed * Time.deltaTime);
-            yield return null;
-        }
-        transform.localPosition = targetLocalPos;
+        ToggleVisuals(false);
     }
 
     public void LevelUp()
     {
         level *= 2;
-        UpdateLevelText();
-
+        UpdateVisuals();
         if (mergeEffect != null) Instantiate(mergeEffect, transform.position, Quaternion.identity);
-        if (animator != null) animator.SetTrigger("LevelUp");
-
-        // --- ÝSTEÐE BAÐLI: LEVEL ATLAYINCA DA HAFÝF ZIPLASIN ---
-        // StartCoroutine(PlaySpawnAnimation()); 
-        // Bunu açarsan level atladýðýnda da ayný pop-up efektini yapar.
     }
 
     void UpdateLevelText()
@@ -154,13 +181,22 @@ public class VehicleWeapon : MonoBehaviour
         if (levelText != null) levelText.text = level.ToString();
     }
 
-    public void DestroyWithAnimation()
+    void ToggleVisuals(bool state)
     {
-        if (animator != null) animator.SetTrigger("MergeDestroy");
-        else
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = state;
+        if (levelText != null) levelText.enabled = state;
+    }
+
+    IEnumerator PlaySpawnAnimation()
+    {
+        transform.localScale = Vector3.zero;
+        float timer = 0f;
+        while (timer < 0.3f)
         {
-            GetComponent<SpriteRenderer>().enabled = false;
-            if (levelText != null) levelText.enabled = false;
+            timer += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, timer / 0.3f);
+            yield return null;
         }
+        transform.localScale = Vector3.one;
     }
 }

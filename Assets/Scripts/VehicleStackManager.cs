@@ -1,101 +1,119 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class VehicleStackManager : MonoBehaviour
 {
+    public static VehicleStackManager Instance;
+
     [Header("Oyun Durumu")]
-    public int maxHealth = 3;
+    public int baseMaxHealth = 3;
+    private int totalMaxHealth;
     private int currentHealth;
     public bool isGameOver = false;
     private bool isMerging = false;
 
     [Header("Ayarlar")]
-    public GameObject baseCarPrefab;
-    public float carHeight = 1.0f;
+    public float carHeight = 0.5f;
     public int maxWeaponCount = 6;
-
     public List<VehicleWeapon> carStack = new List<VehicleWeapon>();
 
-    [Header("Ekonomi")]
-    public int money = 1000;
-    public int currentLevelMoney = 150;
+    [Header("Hasar Ayarları")]
+    [SerializeField] private float damageCooldown = 0.5f;
+    private bool canTakeDamage = true;
 
-    [Header("Satın Alma Ayarları")]
+    [Header("ÖNEMLİ: Modeller")]
+    public GameObject baseWeaponContainer;
+    public GameObject[] weaponModels;
+
+    [Header("Ekonomi (Kayıtlı)")]
+    public int money = 0;
+
+    [Header("Fiyatlandırma")]
     public int basePrice = 50;
+    public int totalPurchasedCount = 1;
     public TextMeshProUGUI buyButtonText;
     public Button buyButtonComponent;
 
-    [Header("Merge (Birleştirme) Ayarları")]
-    public int mergeBasePrice = 50; // Başlangıç fiyatı
-    public int mergePriceIncreaseAmount = 2; // Her kullanımda +2 coin ekle
+    [Header("Merge Ayarları")]
+    public int mergeBasePrice = 50;
+    public int mergePriceIncreaseAmount = 25;
     private int mergeCount = 0;
-
     public TextMeshProUGUI mergeButtonText;
     public Button mergeButtonComponent;
 
-    [Header("UI Genel")]
+    [Header("UI & Efektler")]
     public TextMeshProUGUI moneyText;
     public GameObject gameOverPanel;
-    public TextMeshProUGUI healthText;
+    public GameObject endLevelUpgradePanel;
+    public Image[] hearts;
+    public Sprite fullHeart;
+    public Sprite emptyHeart;
 
-    [Header("Hasar Ayarı")]
-    public float damageCooldown = 0.5f;
-    private float nextDamageTime = 0f;
-
-    [Header("Efektler")]
     public GameObject hitParticlePrefab;
     public CameraShake cameraShake;
-    public float shakeDuration = 0.2f;
-    public float shakeMagnitude = 0.1f;
+    public GameObject mergeEffectPrefab;
+
+    [Header("Perk Manager")]
+    public float tempGoldMultiplier = 1.0f;
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        LoadGameData();
+    }
 
     void Start()
     {
-        // --- DEĞİŞİKLİK BURADA ---
-        // Eskiden: currentHealth = maxHealth;
-
-        // Şimdi: Hafızadan HP Levelini oku
         int hpLevel = PlayerPrefs.GetInt("Upg_MaxHealth", 0);
+        totalMaxHealth = baseMaxHealth + hpLevel;
+        currentHealth = totalMaxHealth;
 
-        // Yeni Max Health = Baz Can + Upgrade Leveli
-        // Örn: Baz 3 + Level 2 = 5 Can
-        int finalMaxHealth = maxHealth + hpLevel;
-
-        currentHealth = finalMaxHealth;
-        // -------------------------
-
-        money = currentLevelMoney;
-        mergeCount = 0;
-
-        UpdateHealthUI(); // Kalpleri ekrana bas
+        UpdateHealthUI();
         SpawnWeapon();
         UpdateUI();
+
+        if (endLevelUpgradePanel != null) endLevelUpgradePanel.SetActive(false);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void SaveGameData()
     {
-        if (isGameOver) return;
+        PlayerPrefs.SetInt("PlayerMoney", money);
+        PlayerPrefs.SetInt("MergeCount", mergeCount);
+        PlayerPrefs.SetInt("TotalPurchased", totalPurchasedCount);
+        PlayerPrefs.Save();
+    }
+
+    void LoadGameData()
+    {
+        money = PlayerPrefs.GetInt("PlayerMoney", 0);
+        mergeCount = PlayerPrefs.GetInt("MergeCount", 0);
+        totalPurchasedCount = PlayerPrefs.GetInt("TotalPurchased", 1);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (isGameOver || !canTakeDamage)
+        {
+            if (other.CompareTag("Stone")) Destroy(other.gameObject);
+            return;
+        }
 
         if (other.CompareTag("Stone"))
         {
-            if (Time.time < nextDamageTime)
-            {
-                if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
-
-                float hitX = other.transform.position.x;
-                if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, other.transform.position, Quaternion.identity);
-
-                Destroy(other.gameObject);
-                ClearColumn(hitX);
-                return;
-            }
-
-            nextDamageTime = Time.time + damageCooldown;
+            StartCoroutine(DamageCooldownRoutine());
             TakeDamage(other.gameObject);
         }
+    }
+
+    IEnumerator DamageCooldownRoutine()
+    {
+        canTakeDamage = false;
+        yield return new WaitForSeconds(damageCooldown);
+        canTakeDamage = true;
     }
 
     void TakeDamage(GameObject stoneObj)
@@ -104,84 +122,90 @@ public class VehicleStackManager : MonoBehaviour
         UpdateHealthUI();
 
         if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
-        if (cameraShake != null) cameraShake.TriggerShake(shakeDuration, shakeMagnitude);
-        if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
+        if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.1f);
 
-        float hitX = stoneObj.transform.position.x;
         Destroy(stoneObj);
-        ClearColumn(hitX);
 
         if (currentHealth <= 0) GameOver();
-    }
-
-    void ClearColumn(float collisionX)
-    {
-        Vector2 startPoint = new Vector2(collisionX, transform.position.y);
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(startPoint, new Vector2(3f, 0.1f), 0f, Vector2.up, 20f);
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider.CompareTag("Stone"))
-            {
-                if (LevelManager.Instance != null) LevelManager.Instance.AddProgress(1);
-                Destroy(hit.collider.gameObject);
-            }
-        }
     }
 
     void GameOver()
     {
         isGameOver = true;
-        if (cameraShake != null) cameraShake.StopShake();
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
-        Time.timeScale = 0f;
-    }
-
-    void UpdateHealthUI()
-    {
-        if (healthText != null)
+        if (LevelManager.Instance != null)
+            LevelManager.Instance.HandleLevelFailed();
+        else
         {
-            string hearts = "";
-            for (int i = 0; i < currentHealth; i++) hearts += "X ";
-            healthText.text = hearts;
+            if (gameOverPanel != null) gameOverPanel.SetActive(true);
+            Time.timeScale = 0f;
         }
     }
 
+    // --- YARDIMCI FONKSİYON: GERÇEK LİMİTİ HESAPLA ---
+    // Bu fonksiyon hem Level'in izin verdiği limiti hem de Upgrade limitini kıyaslar.
+    // Hangisi küçükse onu döndürür. Böylece UI doğru çalışır.
+    int GetEffectiveLimit()
+    {
+        // 1. Satın alınan kapasite (Upgrade)
+        int purchasedLimit = 4 + PlayerPrefs.GetInt("Upg_MaxStack", 0);
+
+        // 2. Levelin tavan yüksekliği (Level Generator'dan gelir)
+        int levelLimit = 100; // Varsayılan yüksek değer
+        if (LevelGenerator.Instance != null)
+        {
+            levelLimit = LevelGenerator.Instance.CurrentLevelMaxHeight;
+        }
+
+        // 3. Oyunun mutlak sınırı (maxWeaponCount) ile de kıyasla
+        // (Hangisi en küçükse o geçerlidir)
+        return Mathf.Min(purchasedLimit, levelLimit, maxWeaponCount);
+    }
+
+    // --- SATIN ALMA ---
     public void BuyWeapon()
     {
+        // Limiti hesapla
+        int limit = GetEffectiveLimit();
+
+        // Eğer limit dolduysa alma
+        if (carStack.Count >= limit) return;
+
         if (isMerging) return;
 
-        if (carStack.Count >= maxWeaponCount) return;
         int currentPrice = GetCurrentPrice();
         if (money >= currentPrice)
         {
             money -= currentPrice;
+            totalPurchasedCount++;
+            SaveGameData();
             SpawnWeapon();
         }
     }
 
+    void SpawnWeapon()
+    {
+        if (baseWeaponContainer != null)
+        {
+            GameObject newCarObj = Instantiate(baseWeaponContainer, transform);
+            VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();
+            newCarScript.level = 1;
+            carStack.Add(newCarScript);
+            UpdatePositions();
+            UpdateUI();
+        }
+    }
+
+    // --- MERGE ---
     public void MergeWeapons()
     {
         if (isMerging || carStack.Count < 2) return;
-
         int mergeCost = GetNextMergeCost();
-
-        if (HasMergeablePair())
+        if (HasMergeablePair() && money >= mergeCost)
         {
-            if (money >= mergeCost)
-            {
-                money -= mergeCost;
-                mergeCount++; // Sayacı artır
-                StartCoroutine(MergeProcess());
-            }
-            else
-            {
-                Debug.Log("Merge için para yetersiz!");
-            }
-        }
-        else
-        {
-            Debug.Log("Birleşecek uygun silah yok!");
+            money -= mergeCost;
+            mergeCount++;
+            SaveGameData();
+            StartCoroutine(MergeProcess());
         }
     }
 
@@ -191,53 +215,20 @@ public class VehicleStackManager : MonoBehaviour
         {
             VehicleWeapon bottomCar = carStack[i];
             VehicleWeapon topCar = carStack[i + 1];
-
             if (bottomCar.level == topCar.level)
             {
                 isMerging = true;
-
-                // 1. ÖNCE DİĞERLERİNİ KAYDIR (Beklemeden başlat)
-                // Üstteki araçların kaymasını başlatıyoruz ki hepsi aynı anda hareket etsin.
-                for (int k = i + 2; k < carStack.Count; k++)
-                {
-                    VehicleWeapon upperCar = carStack[k];
-                    float targetY = ((k - 1) * carHeight) + (carHeight * 0.5f);
-                    Vector3 targetLocalPos = new Vector3(0, targetY, 0);
-
-                    StartCoroutine(upperCar.SmoothMove(targetLocalPos));
-                }
-
-                // 2. BİRLEŞEN SİLAHI GÖNDER VE HAREKETİN BİTMESİNİ BEKLE
-                // WaitForSeconds(0.4f) YERİNE bunu kullanıyoruz.
-                // Bu kod şu anlama gelir: "TopCar hedefe varana kadar bekle, varınca hemen devam et."
                 yield return StartCoroutine(topCar.MoveAndMerge(bottomCar.transform.localPosition));
-
-                // 3. HAREKET BİTTİĞİ GİBİ LEVEL ATLAT (Gecikme Yok)
+                if (mergeEffectPrefab != null) Instantiate(mergeEffectPrefab, bottomCar.transform.position, Quaternion.identity);
                 bottomCar.LevelUp();
-
-                // Üstteki silahı temizle
-                if (topCar != null && topCar.gameObject != null)
-                {
-                    Destroy(topCar.gameObject);
-                }
-
+                if (topCar != null) Destroy(topCar.gameObject);
                 carStack.RemoveAt(i + 1);
                 UpdatePositions();
-
                 isMerging = false;
                 UpdateUI();
                 yield break;
             }
         }
-    }
-
-    void SpawnWeapon()
-    {
-        GameObject newCarObj = Instantiate(baseCarPrefab, transform);
-        VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();
-        carStack.Add(newCarScript);
-        UpdatePositions();
-        UpdateUI();
     }
 
     void UpdatePositions()
@@ -249,79 +240,129 @@ public class VehicleStackManager : MonoBehaviour
         }
     }
 
-    void UpdateUI()
+    // --- UI GÜNCELLEMELERİ (DÜZELTİLDİ) ---
+    public void UpdateUI()
     {
         if (moneyText != null) moneyText.text = money.ToString() + " $";
 
-        if (buyButtonComponent != null && buyButtonText != null)
+        // --- BURASI DÜZELTİLDİ ---
+        // Artık sadece "maxWeaponCount"a değil, o levelin gerçek sınırına bakıyoruz.
+        if (buyButtonComponent != null)
         {
-            if (carStack.Count >= maxWeaponCount)
+            int currentLimit = GetEffectiveLimit(); // Level ve Upgrade limitini al
+
+            if (carStack.Count >= currentLimit)
             {
+                // Sınıra ulaşıldıysa butonu kapat ve MAX yaz
                 buyButtonText.text = "MAX";
                 buyButtonComponent.interactable = false;
             }
             else
             {
+                // Yer varsa fiyatı göster
                 int price = GetCurrentPrice();
-                buyButtonText.text = "BUY " + price + "$";
+                buyButtonText.text = "BUY WEAPON " + price + "$";
                 buyButtonComponent.interactable = (money >= price);
             }
         }
+        // -------------------------
 
-        if (mergeButtonComponent != null && mergeButtonText != null)
+        if (mergeButtonComponent != null)
         {
             int mergeCost = GetNextMergeCost();
             bool canMerge = HasMergeablePair();
+            mergeButtonText.text = canMerge ? "MERGE " + mergeCost + "$" : "NO MERGE";
+            mergeButtonComponent.interactable = canMerge && (money >= mergeCost) && !isMerging;
+        }
+    }
 
-            if (canMerge)
+    void UpdateHealthUI()
+    {
+        if (hearts == null) return;
+        if (currentHealth > hearts.Length) currentHealth = hearts.Length;
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i < currentHealth)
             {
-                mergeButtonText.text = "MERGE " + mergeCost + "$";
-                mergeButtonComponent.interactable = (money >= mergeCost) && !isMerging;
+                hearts[i].sprite = fullHeart;
+                hearts[i].color = Color.white;
             }
             else
             {
-                mergeButtonText.text = "NO MERGE";
-                mergeButtonComponent.interactable = false;
+                hearts[i].sprite = emptyHeart;
             }
+            hearts[i].enabled = (i < totalMaxHealth);
         }
-    }
-
-    // --- FİYAT HESAPLAMALARI ---
-
-    int GetCurrentPrice()
-    {
-        return basePrice * (carStack.Count + 1);
-    }
-
-    // --- YENİ DOĞRUSAL HESAPLAMA ---
-    int GetNextMergeCost()
-    {
-        // 50 + (Sayaç * 2)
-        return mergeBasePrice + (mergeCount * mergePriceIncreaseAmount);
-    }
-
-    bool HasMergeablePair()
-    {
-        if (carStack.Count < 2) return false;
-        for (int i = 0; i < carStack.Count - 1; i++)
-        {
-            if (carStack[i].level == carStack[i + 1].level)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void AddMoney(int amount)
     {
-        money += amount;
+        int finalAmount = Mathf.RoundToInt(amount * tempGoldMultiplier);
+        money += finalAmount;
+        SaveGameData();
         UpdateUI();
+        if (UpgradeManager.Instance != null) UpgradeManager.Instance.UpdateUI();
     }
 
-    public void GoToMainMenu()
+    public void OnHealthUpgradeBought()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        // 1. Yeni kapasiteyi hesapla (Artık bir fazla)
+        int hpLevel = PlayerPrefs.GetInt("Upg_MaxHealth", 0);
+        totalMaxHealth = baseMaxHealth + hpLevel;
+
+        // 2. Mevcut canı SADECE 1 ARTIR (Yeni alınan kalp dolu gelir)
+        currentHealth++;
+
+        // Güvenlik: Asla limiti aşma (Gerçi aşmaz ama tedbir)
+        if (currentHealth > totalMaxHealth) currentHealth = totalMaxHealth;
+
+        // UI'ı güncelle
+        UpdateHealthUI();
     }
+
+    // --- YENİ PERK FONKSİYONU: EN DÜŞÜK SİLAHI YÜKSELT ---
+    public void UpgradeLowestLevelWeapon()
+    {
+        if (carStack.Count == 0) return; // Silah yoksa işlem yapma
+
+        VehicleWeapon lowestWeapon = null;
+        int minLevel = int.MaxValue; // Kıyaslama için en yüksek sayıdan başlıyoruz
+
+        // 1. Kuleyi tara ve en düşük leveli bul
+        foreach (var weapon in carStack)
+        {
+            // Eğer bu silahın leveli, şu ana kadar bulduğumuz en düşükten de küçükse
+            if (weapon.level < minLevel)
+            {
+                minLevel = weapon.level;
+                lowestWeapon = weapon;
+            }
+        }
+
+        // 2. Eğer bir silah bulduysak onu yükselt
+        if (lowestWeapon != null)
+        {
+            Debug.Log($"Perk Aktif: Level {lowestWeapon.level} silah yükseltiliyor...");
+
+            // Silahın kendi LevelUp fonksiyonunu çağırıyoruz
+            // Bu fonksiyon zaten level'i 2 ile çarpıyor ve görseli güncelliyor.
+            lowestWeapon.LevelUp();
+
+            // UI güncelle (Merge butonları vb. değişebilir)
+            UpdateUI();
+
+            // Otomatik Merge Kontrolü (Opsiyonel)
+            // Eğer yükseltme sonrası eşleşme olduysa oyuncu merge butonuna basabilir.
+        }
+    }
+
+    int GetCurrentPrice() { return basePrice * totalPurchasedCount; }
+    int GetNextMergeCost() { return mergeBasePrice + (mergeCount * mergePriceIncreaseAmount); }
+    bool HasMergeablePair()
+    {
+        for (int i = 0; i < carStack.Count - 1; i++)
+            if (carStack[i].level == carStack[i + 1].level) return true;
+        return false;
+    }
+    public void GoToMainMenu() { Time.timeScale = 1f; SceneManager.LoadScene("MainMenu"); }
 }

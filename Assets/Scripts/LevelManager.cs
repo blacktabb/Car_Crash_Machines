@@ -8,34 +8,41 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
-    [Header("Level Uzunluðu (Rastgelelik)")]
-    public int minTargetBase = 8;  // Level 1 için minimum taþ sayýsý
-    public int maxTargetBase = 12; // Level 1 için maksimum taþ sayýsý
-    public int increasePerLevel = 2; // Her levelde bu aralýk ne kadar kaysýn?
+    [Header("Level Bilgileri")]
+    public int currentLevel = 1;
+    private int totalStoneCount = 0;
+    private int destroyedStoneCount = 0;
+    private bool isLevelFinished = false;
 
-    [Header("Zorluk Ayarlarý")]
-    public float hpMultiplier = 1.08f; // %10 yerine %8 artýþ (Daha insaflý)
-    public float baseGameSpeed = 1.5f; // Baþlangýç hýzý (Eskiden 2.0 idi)
-    public float speedMultiplier = 0.02f; // Her level hýz ne kadar artsýn? (Çok yavaþ artýþ)
-    public float maxGameSpeed = 3.0f; // Oyun asla bu hýzdan daha hýzlý olmasýn
+    [Header("Bilgilendirme UI")]
+    public TextMeshProUGUI nextLevelInfoText;
+    public TextMeshProUGUI retryLevelInfoText;
 
-    [Header("Ekonomi (Altýn)")]
-    public int baseGoldReward = 50;
+    [Header("Zorluk ve Hýz")]
+    public float hpMultiplier = 1.08f;
+    public float baseGameSpeed = 1.5f;
+    public float speedMultiplier = 0.02f;
+    public float maxGameSpeed = 3.0f;
+
+    [Header("Ekonomi (Level Sonu Bonusu)")]
+    public int baseGoldReward = 100;
     public int goldPerLevel = 10;
     public TextMeshProUGUI earnedGoldText;
 
-    private int currentLevel = 1;
-    private int currentProgress = 0;
-    private int targetProgress;
-    private bool isLevelFinished = false;
-
-    [Header("UI")]
-    public Slider progressBar;
-    public TextMeshProUGUI levelText;
+    [Header("UI Panelleri")]
+    public Slider progressBar;         // Dolum çubuðu
     public GameObject winPanel;
+    public GameObject gameOverPanel;
 
-    [Header("Referanslar")]
-    public Spawner spawner;
+    [Header("YENÝ PROGRESS BAR UI")]
+    public TextMeshProUGUI levelTitleText; // Üstteki yazý: "Normal Level" / "Boss Level"
+    public TextMeshProUGUI progressText;   // Ortadaki yazý: "0 / 150"
+    public TextMeshProUGUI levelNumberText; // Kalkan içindeki level sayýsý
+
+    [Header("PerkManager")]
+    private float nextPerkThreshold = 0.5f;
+
+    public MonoBehaviour spawner;
 
     void Awake()
     {
@@ -43,102 +50,133 @@ public class LevelManager : MonoBehaviour
         else Destroy(gameObject);
 
         currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
-
-        // --- YENÝ HEDEF BELÝRLEME SÝSTEMÝ (RASTGELE) ---
-        // Her levelde min ve max deðerleri biraz artýrýyoruz
-        int currentMin = minTargetBase + (currentLevel * 1); // Min daha yavaþ artsýn
-        int currentMax = maxTargetBase + (currentLevel * increasePerLevel);
-
-        // Bu aralýktan rastgele bir sayý seçiyoruz
-        targetProgress = Random.Range(currentMin, currentMax + 1);
-
-        Debug.Log($"Level {currentLevel} Baþladý. Hedef Taþ Sayýsý: {targetProgress} (Aralýk: {currentMin}-{currentMax})");
-        // -----------------------------------------------
+        Debug.Log($"Level {currentLevel} Baþlatýlýyor...");
     }
 
     void Start()
     {
-        if (progressBar != null)
-        {
-            progressBar.maxValue = targetProgress;
-            progressBar.value = 0;
-        }
+        // UI Baþlangýç Ayarlarý
+        if (progressBar != null) progressBar.value = 0;
 
-        // BOSS LEVEL KONTROLÜ (Her 5 levelde bir)
         bool isBossLevel = (currentLevel % 5 == 0);
 
-        if (levelText != null)
-        {
-            if (isBossLevel) levelText.text = "BOSS LEVEL " + currentLevel;
-            else levelText.text = "LEVEL " + currentLevel;
+        // --- YENÝ UI GÜNCELLEMELERÝ ---
 
-            if (isBossLevel) levelText.color = Color.red;
-            else levelText.color = Color.white;
+        // 1. Level Baþlýðý (Normal / Boss)
+        if (levelTitleText != null)
+        {
+            levelTitleText.text = isBossLevel ? "BOSS LEVEL" : "NORMAL LEVEL";
+            levelTitleText.color = isBossLevel ? Color.red : Color.white;
         }
+
+        // 2. Kalkan içindeki Level Numarasý
+        if (levelNumberText != null)
+        {
+            levelNumberText.text = currentLevel.ToString();
+        }
+
+        // 3. Ýlerleme Yazýsý (Baþlangýçta 0)
+        if (progressText != null)
+        {
+            progressText.text = "0 / " + totalStoneCount; // Geçici, SetLevelTarget'ta güncellenecek
+        }
+
+        // ------------------------------
 
         if (winPanel != null) winPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
-        ApplyLevelDifficulty();
-    }
-
-    void ApplyLevelDifficulty()
-    {
-        if (GameManager.Instance != null)
-        {
-            // Hýz Hesabý: Baz Hýz + (Level * Ufak Artýþ)
-            float calculatedSpeed = baseGameSpeed + ((currentLevel - 1) * speedMultiplier);
-
-            // Hýzý Max deðere sabitle (Clamp)
-            GameManager.Instance.gameSpeed = Mathf.Clamp(calculatedSpeed, baseGameSpeed, maxGameSpeed);
-
-            Debug.Log($"Oyun Hýzý: {GameManager.Instance.gameSpeed}");
-        }
-    }
-
-    public int GetHealthMultiplier()
-    {
-        // Boss Çarpaný: 1.5x (Daha önce 2.0 idi, düþürdük)
-        float bossMultiplier = (currentLevel % 5 == 0) ? 1.5f : 1.0f;
-
-        // Üstel deðil, kümülatif artýþ (Mathf.Pow yerine düz çarpým daha kontrollü olabilir ama þimdilik Pow kalsýn)
-        // Can artýþýný biraz kýstýk (hpMultiplier = 1.08f tavsiye edilir)
-        float multiplier = Mathf.Pow(hpMultiplier, currentLevel - 1);
-
-        // Sonuç 1'den küçük olamaz
-        if (multiplier < 1) multiplier = 1;
-
-        return Mathf.RoundToInt(multiplier * bossMultiplier);
+        if (nextLevelInfoText != null) nextLevelInfoText.text = "LEVEL " + (currentLevel + 1);
+        if (retryLevelInfoText != null) retryLevelInfoText.text = "LEVEL " + currentLevel;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R)) ResetProgress();
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetProgress();
+        }
     }
 
+    // --- LEVEL GENERATOR BU FONKSÝYONU ÇAÐIRACAK ---
+    public void SetLevelTarget(int amount)
+    {
+        totalStoneCount = amount;
+        destroyedStoneCount = 0;
+        isLevelFinished = false;
+
+        if (progressBar != null)
+        {
+            progressBar.maxValue = totalStoneCount;
+            progressBar.value = 0;
+        }
+
+        // --- YENÝ: Toplam taþ sayýsý belli olunca yazýyý güncelle ---
+        UpdateProgressText();
+        // -----------------------------------------------------------
+
+        nextPerkThreshold = 0.5f;
+        Debug.Log($"Hedef Belirlendi: {totalStoneCount} Taþ");
+    }
+
+    // --- TAÞLAR KIRILINCA ---
     public void AddProgress(int amount)
     {
-        if (isLevelFinished) return;
-        currentProgress += amount;
-        if (progressBar != null) progressBar.value = currentProgress;
+        destroyedStoneCount += amount;
 
-        if (currentProgress >= targetProgress)
+        if (progressBar != null)
+        {
+            progressBar.value = destroyedStoneCount;
+        }
+
+        // --- YENÝ: Her taþ kýrýldýðýnda yazýyý güncelle ---
+        UpdateProgressText();
+        // --------------------------------------------------
+
+        // Perk Sistemi Kontrolü
+        float progressPercent = (float)destroyedStoneCount / (float)totalStoneCount;
+
+        if (progressPercent >= nextPerkThreshold && progressPercent < 0.95f)
+        {
+            if (PerkManager.Instance != null) PerkManager.Instance.ShowPerkSelection();
+            nextPerkThreshold += 0.5f;
+        }
+
+        if (destroyedStoneCount >= totalStoneCount && !isLevelFinished)
         {
             StartCoroutine(FinishLevelRoutine());
         }
     }
 
+    // YENÝ YARDIMCI FONKSÝYON
+    void UpdateProgressText()
+    {
+        if (progressText != null)
+        {
+            // Örnek: "15 / 150"
+            progressText.text = $"{destroyedStoneCount} / {totalStoneCount}";
+
+            // Ýstersen saðda kalan, solda kýrýlan gibi de yapabilirsin.
+            // Örnek: progressText.text = $"{destroyedStoneCount}           {totalStoneCount - destroyedStoneCount}";
+        }
+    }
+
+    public int GetHealthMultiplier()
+    {
+        float bossMultiplier = (currentLevel % 5 == 0) ? 1.5f : 1.0f;
+        float multiplier = Mathf.Pow(hpMultiplier, currentLevel - 1);
+        if (multiplier < 1) multiplier = 1;
+        return Mathf.RoundToInt(multiplier * bossMultiplier);
+    }
+
+    // ... (Kalan fonksiyonlar ayný: FinishLevelRoutine, LevelComplete, vb.) ...
+
     IEnumerator FinishLevelRoutine()
     {
         isLevelFinished = true;
+
         if (progressBar != null) progressBar.value = progressBar.maxValue;
-
         if (spawner != null) spawner.enabled = false;
-
-        // Sahnedeki taþlarýn bitmesini bekle
-        while (GameObject.FindGameObjectsWithTag("Stone").Length > 0)
-        {
-            yield return new WaitForSeconds(0.5f);
-        }
 
         yield return new WaitForSeconds(1.0f);
         LevelComplete();
@@ -146,47 +184,49 @@ public class LevelManager : MonoBehaviour
 
     void LevelComplete()
     {
-        int goldEarned = baseGoldReward + (currentLevel * goldPerLevel);
+        int levelBonus = baseGoldReward + (currentLevel * goldPerLevel);
 
-        int totalGold = PlayerPrefs.GetInt("TotalGold", 0);
-        PlayerPrefs.SetInt("TotalGold", totalGold + goldEarned);
+        if (VehicleStackManager.Instance != null)
+        {
+            VehicleStackManager.Instance.AddMoney(levelBonus);
+        }
+
+        if (earnedGoldText != null)
+            earnedGoldText.text = "+" + levelBonus + " GOLD (Bonus)";
 
         PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
         PlayerPrefs.Save();
 
-        if (earnedGoldText != null) earnedGoldText.text = "+" + goldEarned + " GOLD";
-
         if (winPanel != null) winPanel.SetActive(true);
-        Time.timeScale = 0f;
 
-        CameraShake shaker = Camera.main.GetComponent<CameraShake>();
-        if (shaker != null) shaker.StopShake();
+        Time.timeScale = 0f;
     }
 
-    public void LoadMainMenu()
+    public void HandleLevelFailed()
+    {
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    public void RestartCurrentLevel()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public int GetTargetProgress()
+    public void NextLevel()
     {
-        return targetProgress;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("SampleScene");
     }
 
     public void ResetProgress()
     {
-        Debug.Log("TÜM VERÝLER SÝLÝNÝYOR... (HARD RESET)");
-
-        // 1. HAFIZAYI SÝL
-        // DeleteAll: Altýn, Level, Upgrade'ler... Ne varsa siler.
+        Debug.Log("TÜM ÝLERLEME SÝLÝNÝYOR... SIFIRDAN BAÞLATILIYOR.");
         PlayerPrefs.DeleteAll();
-
-        // Deðiþikliði diske hemen yaz
         PlayerPrefs.Save();
 
-        // 2. SAHNEYÝ YENÝLE
-        // Mevcut sahneyi baþtan yükle
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

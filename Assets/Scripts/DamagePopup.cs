@@ -3,55 +3,64 @@ using TMPro;
 
 public class DamagePopup : MonoBehaviour
 {
-    private TextMeshPro textMesh;
-    private float disappearTimer;
+    private TMP_Text textMesh;
     private Color textColor;
 
-    public static void Create(Vector3 position, int damageAmount, bool isCritical)
-    {
-        // Kaynaklar klasöründen veya referansla prefabý bulup oluþturmak yerine
-        // Genelde Singleton veya referansla çaðrýlýr ama en basit yöntem:
-        // Bu fonksiyonu þimdilik scriptin içinden çaðýracaðýz.
-    }
+    [Header("Animasyon Ayarlarý")]
+    public float moveSpeed = 3f;
+    public float fadeSpeed = 3f;
+    public float lifeTime = 1f;
 
     void Awake()
     {
-        textMesh = GetComponent<TextMeshPro>();
+        textMesh = GetComponent<TMP_Text>();
+        if (textMesh != null)
+        {
+            textColor = textMesh.color;
+        }
     }
 
-    public void Setup(int damageAmount, bool isCritical)
+    // --- DÜZELTME BURADA ---
+    // Artýk 2. parametre olarak 'isCritical' alabiliyor.
+    // '= false' dediðimiz için, eðer 2. deðeri göndermezsen otomatik 'false' kabul eder.
+    // Yani hem Setup(10) hem de Setup(10, true) þeklinde kullanabilirsin.
+    public void Setup(float damageAmount, bool isCritical = false)
     {
-        textMesh.text = damageAmount.ToString();
-
-        if (isCritical)
+        if (textMesh != null)
         {
-            textMesh.fontSize = 8; // Kritikse büyük yaz
-            textMesh.color = Color.red; // Kýrmýzý yap
-        }
-        else
-        {
-            textMesh.fontSize = 5;
-            textMesh.color = Color.yellow;
-        }
+            textMesh.text = damageAmount.ToString("0.#");
 
-        textColor = textMesh.color;
-        disappearTimer = 0.5f; // Yarým saniyede kaybolsun
+            if (isCritical)
+            {
+                // Kritik vuruþsa yazýyý büyüt ve Kýrmýzý yap
+                textMesh.fontSize *= 1.5f;
+                textMesh.color = Color.red;
+                textMesh.text += "!"; // Yanýna ünlem koy
+            }
+            else
+            {
+                // Normal vuruþ (Sarý veya varsayýlan renk)
+                textMesh.fontSize *= 1f; // Normal boyut
+                // textMesh.color = Color.yellow; // Ýstersen rengi zorla
+            }
+
+            textColor = textMesh.color; // Fade iþlemi için rengi kaydet
+        }
     }
 
     void Update()
     {
-        // Yukarý doðru süzülme
-        transform.position += new Vector3(0, 5f) * Time.deltaTime;
+        transform.position += Vector3.up * moveSpeed * Time.deltaTime;
 
-        disappearTimer -= Time.deltaTime;
-        if (disappearTimer < 0)
+        if (textMesh != null)
         {
-            // Yavaþça þeffaflaþ ve yok ol
-            float disappearSpeed = 3f;
-            textColor.a -= disappearSpeed * Time.deltaTime;
+            textColor.a -= fadeSpeed * Time.deltaTime;
             textMesh.color = textColor;
 
-            if (textColor.a < 0) Destroy(gameObject);
+            if (textColor.a <= 0)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }
