@@ -61,7 +61,7 @@ public class StoneHealth : MonoBehaviour
         if (isDead) return;
 
         // 1. GÖRSEL EFEKTLER (Büyüme & Renk)
-        transform.localScale = originalScale * 1.2f;
+        transform.localScale = originalScale * 1f;
         if (stoneRenderer != null) stoneRenderer.material.color = hitColor;
 
         if (!isDamaged)

@@ -48,10 +48,8 @@ public class VehicleStackManager : MonoBehaviour
     [Header("UI & Efektler")]
     public TextMeshProUGUI moneyText;
     public GameObject gameOverPanel;
-    public GameObject endLevelUpgradePanel;
     public Image[] hearts;
-    public Sprite fullHeart;
-    public Sprite emptyHeart;
+    public Sprite Heart;
 
     public GameObject hitParticlePrefab;
     public CameraShake cameraShake;
@@ -75,13 +73,11 @@ public class VehicleStackManager : MonoBehaviour
         UpdateHealthUI();
         SpawnWeapon();
         UpdateUI();
-
-        if (endLevelUpgradePanel != null) endLevelUpgradePanel.SetActive(false);
     }
 
     void SaveGameData()
     {
-        PlayerPrefs.SetInt("PlayerMoney", money);
+        PlayerPrefs.SetInt("TotalGold", money);
         PlayerPrefs.SetInt("MergeCount", mergeCount);
         PlayerPrefs.SetInt("TotalPurchased", totalPurchasedCount);
         PlayerPrefs.Save();
@@ -89,7 +85,7 @@ public class VehicleStackManager : MonoBehaviour
 
     void LoadGameData()
     {
-        money = PlayerPrefs.GetInt("PlayerMoney", 0);
+        money = PlayerPrefs.GetInt("TotalGold", 0);
         mergeCount = PlayerPrefs.GetInt("MergeCount", 0);
         totalPurchasedCount = PlayerPrefs.GetInt("TotalPurchased", 1);
     }
@@ -123,6 +119,11 @@ public class VehicleStackManager : MonoBehaviour
 
         if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
         if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.1f);
+        // Çarpan taş yok olacağı için LevelManager'a haber veriyoruz
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.Instance.AddProgress(1);
+        }
 
         Destroy(stoneObj);
 
@@ -279,21 +280,29 @@ public class VehicleStackManager : MonoBehaviour
     void UpdateHealthUI()
     {
         if (hearts == null) return;
-        if (currentHealth > hearts.Length) currentHealth = hearts.Length;
+
+        currentHealth = Mathf.Clamp(currentHealth, 0, totalMaxHealth);
+
         for (int i = 0; i < hearts.Length; i++)
         {
-            if (i < currentHealth)
+            // Maksimumdan fazlasını tamamen gizle
+            if (i >= totalMaxHealth)
             {
-                hearts[i].sprite = fullHeart;
+                hearts[i].enabled = false;
+                continue;
+            }
+
+            // Can varsa kalbi göster, yoksa gizle
+            hearts[i].enabled = i < currentHealth;
+
+            if (hearts[i].enabled)
+            {
+                hearts[i].sprite = Heart;
                 hearts[i].color = Color.white;
             }
-            else
-            {
-                hearts[i].sprite = emptyHeart;
-            }
-            hearts[i].enabled = (i < totalMaxHealth);
         }
     }
+
 
     public void AddMoney(int amount)
     {
@@ -354,6 +363,18 @@ public class VehicleStackManager : MonoBehaviour
             // Otomatik Merge Kontrolü (Opsiyonel)
             // Eğer yükseltme sonrası eşleşme olduysa oyuncu merge butonuna basabilir.
         }
+    }
+
+    public void Revive()
+    {
+        currentHealth = totalMaxHealth;
+        isGameOver = false; 
+        UpdateHealthUI();
+        UpdateUI();
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (LevelManager.Instance != null)
+            LevelManager.Instance.ResumeAfterRevive();
+        Time.timeScale = 1f;
     }
 
     int GetCurrentPrice() { return basePrice * totalPurchasedCount; }

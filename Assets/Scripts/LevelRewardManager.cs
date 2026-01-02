@@ -27,6 +27,11 @@ public class LevelRewardManager : MonoBehaviour
         int currentMoney = PlayerPrefs.GetInt("TotalGold", 0);
         PlayerPrefs.SetInt("TotalGold", currentMoney + finalReward);
         PlayerPrefs.Save();
+    }
 
+    public void AdRevive()
+    {
+        Debug.Log("Reklam izlendi, oyuncu canlandýrýlýyor.");
+        VehicleStackManager.Instance.Revive();
     }
 }

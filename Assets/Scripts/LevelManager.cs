@@ -91,14 +91,6 @@ public class LevelManager : MonoBehaviour
         if (retryLevelInfoText != null) retryLevelInfoText.text = currentLevel.ToString();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetProgress();
-        }
-    }
-
     // --- LEVEL GENERATOR BU FONKSÝYONU ÇAÐIRACAK ---
     public void SetLevelTarget(int amount)
     {
@@ -189,6 +181,7 @@ public class LevelManager : MonoBehaviour
         PlayerPrefs.Save();
 
         if (winPanel != null) winPanel.SetActive(true);
+        rewardManager.ShowReward(currentLevel, playerCurrentHealth, playerMaxHealth);
 
         Time.timeScale = 0f;
     }
@@ -211,13 +204,17 @@ public class LevelManager : MonoBehaviour
         SceneManager.LoadScene("SampleScene");
     }
 
-    public void ResetProgress()
+    public void ResumeAfterRevive()
     {
-        Debug.Log("TÜM ÝLERLEME SÝLÝNÝYOR... SIFIRDAN BAÞLATILIYOR.");
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
+        isLevelFinished = false;
 
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (spawner != null)
+            spawner.enabled = true;
+
+        // Progress bar’ý tekrar sync et
+        if (progressBar != null)
+            progressBar.value = destroyedStoneCount;
+
+        UpdateProgressText();
     }
 }
