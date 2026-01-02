@@ -376,6 +376,12 @@ public class VehicleStackManager : MonoBehaviour
             LevelManager.Instance.ResumeAfterRevive();
         Time.timeScale = 1f;
     }
+    public void AddHealth()
+    {
+        currentHealth = totalMaxHealth;
+        UpdateHealthUI();
+    }
+
 
     int GetCurrentPrice() { return basePrice * totalPurchasedCount; }
     int GetNextMergeCost() { return mergeBasePrice + (mergeCount * mergePriceIncreaseAmount); }
