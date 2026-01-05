@@ -8,7 +8,7 @@ public class RewardButtons : MonoBehaviour
     public List<GameObject> buttons;
 
     [Header("Süreler")]
-    public float interval = 5f;
+    public float interval = 30f;
     public float showDuration = 5f;
     public float fadeDuration = 0.3f;
 

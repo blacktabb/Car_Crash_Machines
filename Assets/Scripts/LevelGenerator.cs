@@ -7,12 +7,10 @@ public class LevelGenerator : MonoBehaviour
     public struct LevelTheme
     {
         public string themeName;
-
         [Header("Özel Bölge Taþlarý")]
-        public GameObject[] topStonePrefabs; // En üstte çýkacaklar (Çim vb.)
-
+        public GameObject[] topStonePrefabs;
         [Header("Standart Taþlar")]
-        public GameObject[] smallStones;     // Alt kýsýmlar
+        public GameObject[] smallStones;
         public GameObject[] bigStones;
         public GameObject[] rareStones;
     }
@@ -24,18 +22,22 @@ public class LevelGenerator : MonoBehaviour
     public int topLayerCount = 1;
 
     [Header("Dinamik Yükseklik Ayarlarý")]
-    public int startMaxHeight = 3;     // Level 1'de kaç kat?
-    public int absoluteMaxHeight = 12; // TAVAN SINIRI (Eski maxHeight yerine bunu kullanacaðýz)
-    public int increaseEveryXLevel = 3; // Kaç levelde bir artsýn?
-    public int heightVariation = 2;     // Dalgalanma miktarý
+    public int startMaxHeight = 3;
+    public int absoluteMaxHeight = 12;
+    public int increaseEveryXLevel = 3;
+    public int heightVariation = 2;
 
-    [Header("Level Ayarlarý")]
-    public int levelLength = 50;
+    [Header("Dinamik Uzunluk Ayarlarý")]
+    public int baseLevelLength = 50;       // Level 1 uzunluðu
+    public int lengthIncreasePerLevel = 5; // Level baþý artýþ
+    public int maxLevelLength = 250;       // Max sýnýr
+
+    [Header("Debug (Sadece Ýzleme Ýçin)")]
+    // Inspector'da elle deðiþtirme, oyun hesaplar.
+    public int currentCalculatedLength;
+
     public static LevelGenerator Instance;
     public int CurrentLevelMaxHeight { get; private set; }
-
-    // NOT: Eski minHeight ve maxHeight deðiþkenlerini kaldýrdýk.
-    // Artýk dinamik hesaplanýyorlar.
 
     [Header("Grid Ayarlarý")]
     public float cellSize = 1f;
@@ -51,24 +53,39 @@ public class LevelGenerator : MonoBehaviour
     public float levelMultiplier = 2.5f;
     public int bigStoneHealthMult = 3;
 
+    [Header("Bitiþ Ayarlarý")]
+    public GameObject finishLinePrefab;
+    public float finishLineOffset = 5f;
+
     private bool[,] gridMap;
-
-    void Start()
-    {
-        // --- DÜZELTME BURADA YAPILDI ---
-        // Eskiden: new bool[levelLength, maxHeight + 5]; yazýyordu.
-        // Artýk "absoluteMaxHeight" kullanýyoruz ki hafýzada en geniþ yeri ayýrsýn.
-        gridMap = new bool[levelLength, absoluteMaxHeight + 5];
-
-        GenerateGridAndSpawn();
-    }
 
     void Awake()
     {
         if (Instance == null) Instance = this;
 
         CalculateCurrentLevelMaxHeight();
+        CalculateLevelLength();
     }
+
+    void Start()
+    {
+        // Grid haritasýný hesaplanan uzunluða göre oluþturuyoruz
+        gridMap = new bool[currentCalculatedLength, absoluteMaxHeight + 5];
+
+        GenerateGridAndSpawn();
+    }
+
+    // --- UZUNLUK HESABI ---
+    void CalculateLevelLength()
+    {
+        int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
+
+        int calculated = baseLevelLength + ((currentLevel - 1) * lengthIncreasePerLevel);
+        currentCalculatedLength = Mathf.Min(calculated, maxLevelLength);
+
+        Debug.Log($"LEVEL: {currentLevel} | UZUNLUK: {currentCalculatedLength} (Max: {maxLevelLength})");
+    }
+    // ----------------------
 
     void GenerateGridAndSpawn()
     {
@@ -76,28 +93,24 @@ public class LevelGenerator : MonoBehaviour
         int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
         int currentMaxHeight = CurrentLevelMaxHeight;
 
-        // --- DÝNAMÝK YÜKSEKLÝK HESABI ---       
         int currentMinHeight = Mathf.Max(1, currentMaxHeight - heightVariation);
-        // --------------------------------
 
         int themeIndex = (currentLevel - 1) % themes.Length;
         LevelTheme activeTheme = themes[themeIndex];
 
-        for (int x = 0; x < levelLength; x++)
+        // Döngü hesaplanan uzunluðu kullanýyor
+        for (int x = 0; x < currentCalculatedLength; x++)
         {
-            // Sütun yüksekliðini belirle
             int currentColHeight = Random.Range(currentMinHeight, currentMaxHeight + 1);
-
-            // SafeZone (Üst katman korumasý)
             int safeZoneY = currentColHeight - topLayerCount;
 
             for (int y = 0; y < currentColHeight; y++)
             {
                 if (gridMap[x, y]) continue;
 
-                // 1. BÜYÜK TAÞ KONTROLÜ
+                // 1. BÜYÜK TAÞ
                 bool wantBig = Random.value < bigStoneChance;
-                bool canFitBig = (x < levelLength - 1) && (y < currentColHeight - 1);
+                bool canFitBig = (x < currentCalculatedLength - 1) && (y < currentColHeight - 1);
                 bool isBelowTopLayer_Big = (y + 1) < safeZoneY;
 
                 if (wantBig && canFitBig && isBelowTopLayer_Big && activeTheme.bigStones.Length > 0)
@@ -112,7 +125,7 @@ public class LevelGenerator : MonoBehaviour
                     }
                 }
 
-                // 2. ÖZEL TAÞ (RARE) KONTROLÜ
+                // 2. ÖZEL TAÞ (RARE)
                 bool wantRare = Random.value < rareStoneChance;
                 bool isBelowTopLayer_Rare = y < safeZoneY;
 
@@ -124,7 +137,7 @@ public class LevelGenerator : MonoBehaviour
                     continue;
                 }
 
-                // 3. KÜÇÜK TAÞ / ÜST KATMAN TAÞI
+                // 3. KÜÇÜK TAÞ
                 bool isTopLayer = y >= safeZoneY;
 
                 if (isTopLayer && activeTheme.topStonePrefabs.Length > 0)
@@ -142,13 +155,22 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        // --- HATA BURADAYDI, DÜZELTÝLDÝ ---
+        // levelLength yerine currentCalculatedLength yazýyoruz.
+        float endXPosition = CalculateWorldPos(currentCalculatedLength, 0).x + finishLineOffset;
+
+        if (finishLinePrefab != null)
+        {
+            Vector3 finishPos = new Vector3(endXPosition, 0, 0);
+            Instantiate(finishLinePrefab, finishPos, Quaternion.identity);
+        }
+
         if (LevelManager.Instance != null)
         {
             LevelManager.Instance.SetLevelTarget(totalStonesSpawned);
         }
     }
 
-    // --- YARDIMCI FONKSÝYONLAR (AYNI) ---
     void SpawnStoneFromList(GameObject[] sourceList, int xIndex, int yIndex, bool isBig)
     {
         if (sourceList == null || sourceList.Length == 0) return;
@@ -206,7 +228,8 @@ public class LevelGenerator : MonoBehaviour
             levelBaseHP *= bossHPMultiplier;
         }
 
-        float progressPercent = (float)xIndex / (float)levelLength;
+        // currentCalculatedLength kullanarak oranla
+        float progressPercent = (float)xIndex / (float)currentCalculatedLength;
         float distanceMultiplier = 1.0f + (progressPercent * 0.5f);
 
         float finalHPFloat = levelBaseHP * distanceMultiplier;
@@ -222,13 +245,8 @@ public class LevelGenerator : MonoBehaviour
     public void CalculateCurrentLevelMaxHeight()
     {
         int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
-
-        // Formül
         int calculatedMax = startMaxHeight + ((currentLevel - 1) / increaseEveryXLevel);
-
-        // Sýnýrla ve Kaydet
         CurrentLevelMaxHeight = Mathf.Clamp(calculatedMax, startMaxHeight, absoluteMaxHeight);
-
         Debug.Log($"LEVEL: {currentLevel} | HESAPLANAN TAVAN YÜKSEKLÝÐÝ: {CurrentLevelMaxHeight}");
     }
 }

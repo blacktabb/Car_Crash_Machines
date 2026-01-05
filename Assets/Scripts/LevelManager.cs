@@ -192,11 +192,33 @@ public class LevelManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // --- BURASI DEÐÝÞTÝ ---
     public void RestartCurrentLevel()
     {
         Time.timeScale = 1f;
+
+        // Retry yaptýðýmýzda fiyat verilerini sýfýrlýyoruz.
+        ResetPriceData();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    // Fiyatlarý sýfýrlayan yardýmcý fonksiyon
+    // Fiyatlarý sýfýrlayan yardýmcý fonksiyon
+    private void ResetPriceData()
+    {
+        // 1. Merge Fiyatýný Sýfýrla (Senin scriptindeki isim: "MergeCount")
+        PlayerPrefs.DeleteKey("MergeCount");
+
+        // 2. Silah Alma Fiyatýný Sýfýrla (Senin scriptindeki isim: "TotalPurchased")
+        PlayerPrefs.DeleteKey("TotalPurchased");
+
+        // Deðiþiklikleri kaydet
+        PlayerPrefs.Save();
+
+        // Not: "TotalGold" anahtarýný silmiyoruz, parasý cebinde kalsýn.
+    }
+    // -----------------------
 
     public void NextLevel()
     {
@@ -216,5 +238,24 @@ public class LevelManager : MonoBehaviour
             progressBar.value = destroyedStoneCount;
 
         UpdateProgressText();
+    }
+
+    public void ForceFinishLevel()
+    {
+        // Eðer level zaten bittiyse tekrar çalýþtýrma
+        if (isLevelFinished) return;
+
+        Debug.Log("FÝNÝÞ ÇÝZGÝSÝ GEÇÝLDÝ! Level Zorla Bitiriliyor...");
+
+        // Sayacý hileyle %100 yapýyoruz (Görsel olarak tam görünsün diye)
+        destroyedStoneCount = totalStoneCount;
+
+        if (progressBar != null)
+            progressBar.value = progressBar.maxValue;
+
+        UpdateProgressText(); // Yazýyý da güncelle (örn: 150/150 yap)
+
+        // Normal bitiþ rutinini çaðýr
+        StartCoroutine(FinishLevelRoutine());
     }
 }

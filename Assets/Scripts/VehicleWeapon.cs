@@ -9,9 +9,7 @@ public class VehicleWeapon : MonoBehaviour
     public float baseDamage = 2f;
     public float baseFireRate = 1.0f;
 
-    [Header("Merge Dengesi (YENÝ)")]
-    // 1.5 = Her merge iþleminde %50 güçlenir (Tavsiye edilen: 1.2 ile 1.5 arasý)
-    // 2.0 yaparsan eski sistemle ayný olur (%100 artýþ).
+    [Header("Merge Dengesi")]
     public float damageMultiplierPerMerge = 1.20f;
 
     [Header("Görseller & Referanslar")]
@@ -25,7 +23,6 @@ public class VehicleWeapon : MonoBehaviour
     public float mergeMoveSpeed = 15f;
     private float nextFireTime = 0f;
 
-    // Geçici Güçlendirmeler
     [HideInInspector] public float tempDamageMultiplier = 1.0f;
     [HideInInspector] public float tempFireRateDivider = 1.0f;
     [HideInInspector] public float tempCritChanceAdd = 0f;
@@ -40,10 +37,17 @@ public class VehicleWeapon : MonoBehaviour
 
     void Update()
     {
+        // --- YENÝ EKLENEN KISIM: FREN SÝSTEMÝ ---
+        // Eðer GameManager yoksa veya Oyun Hýzý 0 veya daha az ise
+        // Yani "Tap to Play" ekranýndaysak veya oyun durduysa ATEÞ ETME.
+        if (GameManager.Instance == null || GameManager.Instance.gameSpeed <= 0f)
+            return;
+        // ----------------------------------------
+
         HandleShooting();
     }
 
-    // ... (UpdateVisuals ve HandleShooting Hýz kýsýmlarý ayný kalýyor) ...
+    // ... (Kodun geri kalaný aynen devam ediyor) ...
 
     public void UpdateVisuals()
     {
@@ -72,7 +76,6 @@ public class VehicleWeapon : MonoBehaviour
 
     void HandleShooting()
     {
-        // HIZ HESABI (Aynen Kalýyor)
         float bonusSpeed = 0f;
         if (UpgradeManager.Instance != null)
         {
@@ -101,9 +104,6 @@ public class VehicleWeapon : MonoBehaviour
 
         if (bulletScript != null)
         {
-            // --- YENÝ HASAR HESABI ---
-
-            // 1. Upgrade'den gelen sabit hasarý al
             float bonusDamage = 0f;
             if (UpgradeManager.Instance != null)
             {
@@ -111,24 +111,12 @@ public class VehicleWeapon : MonoBehaviour
                 bonusDamage = atkLvl * UpgradeManager.Instance.incValue_Atk;
             }
 
-            // 2. MERGE GÜCÜNÜ HESAPLA (Üstel Artýþ)
-            // Level 1 -> tier 0
-            // Level 2 -> tier 1
-            // Level 4 -> tier 2
-            float tierIndex = Mathf.Log(level, 2); // Kaçýncý seviye olduðunu bul (0, 1, 2, 3...)
-
-            // Çarpaný hesapla: 1.3 ^ 2 gibi
+            float tierIndex = Mathf.Log(level, 2);
             float mergeMultiplier = Mathf.Pow(damageMultiplierPerMerge, tierIndex);
-
-            // FORMÜL: (BazHasar * MergeÇarpaný) + UpgradeBonusu
             float finalDamage = (baseDamage * mergeMultiplier) + bonusDamage;
 
-            // -------------------------
-
-            // Perk Çarpaný
             finalDamage *= tempDamageMultiplier;
 
-            // --- KRÝTÝK HESABI (Ayný Kalýyor) ---
             float critChance = 5.0f;
             float critMult = 1.5f;
 
@@ -146,7 +134,6 @@ public class VehicleWeapon : MonoBehaviour
             bool isCritical = (Random.Range(0f, 100f) < critChance);
             if (isCritical) finalDamage *= critMult;
 
-            // Virgüllü hasarý gönder
             bulletScript.SetDamage(finalDamage, isCritical);
 
             if (isCritical)

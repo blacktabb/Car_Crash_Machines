@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // Gerekirse kalsýn ama artýk Slot scripti üzerinden gideceðiz
+using TMPro;
 using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
@@ -12,8 +12,7 @@ public class UpgradeManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    [Header("YENÝ UI SLOTLARI (Inspector'dan Atanacak)")]
-    // TextMeshProUGUI yerine artýk oluþturduðumuz scripti istiyoruz
+    [Header("UI SLOTLARI")]
     public UpgradeSlotUI slot_AtkPower;
     public UpgradeSlotUI slot_AtkSpeed;
     public UpgradeSlotUI slot_CritRate;
@@ -31,12 +30,16 @@ public class UpgradeManager : MonoBehaviour
     public int baseCost_Stack = 200; public int costInc_Stack = 250;
     public int baseCost_Gold = 15; public int costInc_Gold = 10;
 
-    [Header("Upgrade Deðerleri (Level Baþýna Artýþ)")]
+    [Header("Upgrade Deðerleri")]
     public float incValue_Atk = 0.3f;
     public float incValue_Spd = 0.1f;
     public float incValue_CritRate = 1f;
     public float incValue_CritDmg = 0.2f;
     public int incValue_Gold = 1;
+
+    // --- LÝMÝTLER ---
+    private int absoluteMaxLimit_Stack = 8; // Silah slotu limiti
+    private int maxLevel_CritRate = 30;     // Crit Rate limiti (YENÝ)
 
     void Start()
     {
@@ -47,97 +50,88 @@ public class UpgradeManager : MonoBehaviour
     {
         int currentGold = GetCurrentMoney();
 
-        // 1. ATTACK POWER
+        // 1. ATTACK POWER (Sýnýr yok)
         CalculateAndSetSlot(slot_AtkPower, "Upg_AtkPower", baseCost_Atk, costInc_Atk, currentGold,
             $"Increases damage by {incValue_Atk}");
 
-        // 2. ATTACK SPEED
+        // 2. ATTACK SPEED (Sýnýr yok)
         CalculateAndSetSlot(slot_AtkSpeed, "Upg_AtkSpeed", baseCost_Spd, costInc_Spd, currentGold,
             $"Increases speed by {incValue_Spd}");
 
-        // 3. CRIT RATE
+        // 3. CRIT RATE (Max Level 30 Sýnýrý Var!)
+        // Buraya 'maxLevel_CritRate' deðiþkenini gönderiyoruz.
         CalculateAndSetSlot(slot_CritRate, "Upg_CritRate", baseCost_CritRate, costInc_CritRate, currentGold,
-            $"Increases crit chance by %{incValue_CritRate}");
+            $"Increases crit chance by %{incValue_CritRate}", maxLevel_CritRate);
 
-        // 4. CRIT DMG
+        // 4. CRIT DMG (Sýnýr yok)
         CalculateAndSetSlot(slot_CritDmg, "Upg_CritDmg", baseCost_CritDmg, costInc_CritDmg, currentGold,
             $"Increases crit damage by x{incValue_CritDmg}");
 
-        // 5. MAX HEALTH
+        // 5. MAX HEALTH (Sýnýr yok)
         CalculateAndSetSlot(slot_MaxHealth, "Upg_MaxHealth", baseCost_HP, costInc_HP, currentGold,
             "Increases max health by 1 HP");
 
-        // 6. MAX STACK (Özel Durum: Kilitli olabilir)
+        // 6. MAX STACK (Özel fonksiyonu var)
         UpdateMaxStackSlot(currentGold);
 
-        // 7. GOLD GAIN
+        // 7. GOLD GAIN (Sýnýr yok)
         CalculateAndSetSlot(slot_GoldGain, "Upg_GoldGain", baseCost_Gold, costInc_Gold, currentGold,
             $"Increases gold per stone by {incValue_Gold}");
     }
 
-    // --- YENÝ YARDIMCI FONKSÝYON ---
-    // Bu fonksiyon matematiði yapar ve sonucu Slot Scriptine gönderir
-    void CalculateAndSetSlot(UpgradeSlotUI slot, string saveKey, int baseCost, int costInc, int playerGold, string description)
+    // --- GÜNCELLENEN FONKSÝYON: MaxLevel Parametresi Eklendi ---
+    // varsayýlan deðer (int.MaxValue) verdik ki diðerlerinde deðiþiklik yapmamýza gerek kalmasýn.
+    void CalculateAndSetSlot(UpgradeSlotUI slot, string saveKey, int baseCost, int costInc, int playerGold, string description, int maxLevel = int.MaxValue)
     {
         if (slot == null) return;
 
         int lvl = PlayerPrefs.GetInt(saveKey, 0);
+
+        // --- MAX LEVEL KONTROLÜ ---
+        if (lvl >= maxLevel)
+        {
+            slot.UpdateSlot(lvl, "Max Level Reached", 0, false);
+            if (slot.priceText != null) slot.priceText.text = "MAX";
+            return;
+        }
+        // --------------------------
+
         int cost = baseCost + (lvl * costInc);
         bool canAfford = (playerGold >= cost);
 
-        // Slot scriptindeki UpdateSlot fonksiyonunu çaðýr
         slot.UpdateSlot(lvl, description, cost, canAfford);
     }
 
-    // Stack Upgrade için özel kontrol (Limitler olduðu için ayrý tuttum)
     void UpdateMaxStackSlot(int currentGold)
     {
-        if (slot_MaxStack == null || LevelGenerator.Instance == null) return;
+        if (slot_MaxStack == null) return;
 
         int lvl = PlayerPrefs.GetInt("Upg_MaxStack", 0);
         int cost = baseCost_Stack + (lvl * costInc_Stack);
-        int purchasedStack = 3 + lvl; // Baþlangýç 3 + level
-
-        int absoluteMax = LevelGenerator.Instance.absoluteMaxHeight;
-        int currentLevelLimit = LevelGenerator.Instance.CurrentLevelMaxHeight;
+        int currentCapacity = 4 + lvl;
 
         string desc = "Unlock +1 weapon slot";
         bool isInteractable = (currentGold >= cost);
-        string priceText = cost.ToString();
 
-        // 1. Mutlak Limite Ulaþýldý mý?
-        if (purchasedStack >= absoluteMax)
+        if (currentCapacity >= absoluteMaxLimit_Stack)
         {
             slot_MaxStack.UpdateSlot(lvl, "Max Limit Reached", 0, false);
             if (slot_MaxStack.priceText != null) slot_MaxStack.priceText.text = "MAX";
             return;
         }
 
-        // 2. Level Limidine Takýldý mý?
-        if (purchasedStack >= currentLevelLimit)
-        {
-            // Kaçýncý levelde açýlacaðýný hesapla
-            int startH = LevelGenerator.Instance.startMaxHeight;
-            int incX = LevelGenerator.Instance.increaseEveryXLevel;
-            int neededHeight = purchasedStack + 1;
-            int targetLevel = ((neededHeight - startH) * incX) + 1;
-
-            if (LevelManager.Instance != null && targetLevel <= LevelManager.Instance.currentLevel)
-                targetLevel = LevelManager.Instance.currentLevel + 1;
-
-            desc = $"LOCKED! Unlocks at Level {targetLevel}";
-            isInteractable = false; // Kilitli olduðu için alýnamaz
-        }
-
-        // Slotu Güncelle
         slot_MaxStack.UpdateSlot(lvl, desc, cost, isInteractable);
     }
 
-    // --- SATIN ALMA FONKSÝYONLARI (Aynen Kalýyor) ---
-    public void BuyUpgrade(string saveKey, int baseCost, int costInc)
+    // --- GÜNCELLENEN SATIN ALMA: MaxLevel Parametresi Eklendi ---
+    public void BuyUpgrade(string saveKey, int baseCost, int costInc, int maxLevel = int.MaxValue)
     {
-        int currentGold = GetCurrentMoney();
         int currentLevel = PlayerPrefs.GetInt(saveKey, 0);
+
+        // Eðer zaten max seviyedeysek alma
+        if (currentLevel >= maxLevel) return;
+
+        int currentGold = GetCurrentMoney();
         int cost = baseCost + (currentLevel * costInc);
 
         if (currentGold >= cost)
@@ -146,25 +140,27 @@ public class UpgradeManager : MonoBehaviour
             SaveMoney(currentGold);
             PlayerPrefs.SetInt(saveKey, currentLevel + 1);
             PlayerPrefs.Save();
-            UpdateUI(); // UI'ý yenile
+            UpdateUI();
         }
     }
 
-    // Butonlarýn OnClick eventine baðlanacak fonksiyonlar
+    // --- BUTON BAÐLANTILARI ---
+
+    // CRIT RATE ÝÇÝN LÝMÝTÝ BURADAN GÖNDERÝYORUZ (maxLevel_CritRate)
+    public void BuyUpgrade_CritRate() { BuyUpgrade("Upg_CritRate", baseCost_CritRate, costInc_CritRate, maxLevel_CritRate); }
+
+    // Diðerleri sýnýrsýz (Varsayýlan int.MaxValue kullanýrlar)
     public void BuyUpgrade_MaxHealth() { BuyUpgrade("Upg_MaxHealth", baseCost_HP, costInc_HP); if (VehicleStackManager.Instance != null) VehicleStackManager.Instance.OnHealthUpgradeBought(); }
     public void BuyUpgrade_GoldGain() { BuyUpgrade("Upg_GoldGain", baseCost_Gold, costInc_Gold); }
     public void BuyUpgrade_AttackPower() { BuyUpgrade("Upg_AtkPower", baseCost_Atk, costInc_Atk); }
     public void BuyUpgrade_AttackSpeed() { BuyUpgrade("Upg_AtkSpeed", baseCost_Spd, costInc_Spd); }
-    public void BuyUpgrade_CritRate() { BuyUpgrade("Upg_CritRate", baseCost_CritRate, costInc_CritRate); }
     public void BuyUpgrade_CritDmg() { BuyUpgrade("Upg_CritDmg", baseCost_CritDmg, costInc_CritDmg); }
 
     public void BuyUpgrade_MaxStack()
     {
-        if (LevelGenerator.Instance != null)
-        {
-            int purchasedStack = 3 + PlayerPrefs.GetInt("Upg_MaxStack", 0);
-            if (purchasedStack >= LevelGenerator.Instance.CurrentLevelMaxHeight) return; // Kilitliyse alma
-        }
+        int currentCapacity = 4 + PlayerPrefs.GetInt("Upg_MaxStack", 0);
+        if (currentCapacity >= absoluteMaxLimit_Stack) return;
+
         BuyUpgrade("Upg_MaxStack", baseCost_Stack, costInc_Stack);
         if (VehicleStackManager.Instance != null) VehicleStackManager.Instance.UpdateUI();
     }

@@ -22,7 +22,6 @@ public class StoneHealth : MonoBehaviour
     private Color originalColor;
     private Vector3 originalScale;
     public float recoverySpeed = 20f;
-    private Slider healthSlider;
     private bool isDamaged = false;
 
     [Header("Shader Ayarlarý")]
@@ -30,21 +29,40 @@ public class StoneHealth : MonoBehaviour
     private string crackProperty = "_CrackAmount";
     private Material myMaterial;
 
+    [Header("UI - Can Barý")]
+    public Canvas healthBarCanvas; // Canvas objesini açýp kapatmak için
+    public Slider healthSlider;           // Slider deðerini deðiþtirmek için
+
     // --- KÝLÝT MEKANÝZMASI ---
     private bool isDead = false;
 
     void Start()
     {
+        // --- BU KISIM EKLENECEK / DEÐÝÞECEK ---
+        // Eðer Inspector'dan atayamadýysan, kod kendisi bulsun:
+
+        if (healthBarCanvas == null)
+            healthBarCanvas = GetComponentInChildren<Canvas>(); // Çocuðumdaki Canvas'ý bul
+
+        if (healthSlider == null)
+            healthSlider = GetComponentInChildren<Slider>();    // Çocuðumdaki Slider'ý bul
+        // --------------------------------------
+
         originalScale = transform.localScale;
         if (originalScale == Vector3.zero) originalScale = Vector3.one;
         currentHealth = maxHealth;
 
-        // Shader materyalini al
-        if (stoneRenderer != null)
+        // ... Diðer kodlarýn aynen devam ediyor ...
+
+        // Canvas ve Slider bulunduysa baþlangýç ayarlarýný yap
+        if (healthSlider != null)
         {
-            myMaterial = stoneRenderer.material;
-            UpdateCrackEffect(); // Baþlangýçta sýfýrla
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
         }
+
+        if (healthBarCanvas != null)
+            healthBarCanvas.gameObject.SetActive(false); // Baþlangýçta gizle
     }
 
     public void SetHealth(int amount)
@@ -64,12 +82,20 @@ public class StoneHealth : MonoBehaviour
         transform.localScale = originalScale * 1f;
         if (stoneRenderer != null) stoneRenderer.material.color = hitColor;
 
-        if (!isDamaged)
+        // --- YENÝ CAN BARI KODU ---
+        if (healthBarCanvas != null && healthSlider != null)
         {
-            isDamaged = true;
-            if (healthSlider == null) healthSlider = GetComponentInChildren<Slider>();
-            if (healthSlider != null) healthSlider.gameObject.SetActive(true);
+            // Eðer bar kapalýysa aç (Ýlk vuruþta görünür olsun)
+            if (healthBarCanvas != null)
+            {
+                if (!healthBarCanvas.gameObject.activeSelf)
+                    healthBarCanvas.gameObject.SetActive(true);
+
+                // Slider'ý güncelle
+                healthSlider.value = currentHealth;
+            }
         }
+        // --------------------------
 
         // 2. HASAR POPUP'INI OLUÞTUR (EKSÝK OLAN KISIM BUYDU)
         if (damagePopupPrefab != null)
@@ -86,7 +112,7 @@ public class StoneHealth : MonoBehaviour
         {
             healthSlider.maxValue = maxHealth;
             healthSlider.value = currentHealth;
-        }
+        }       
 
         if (currentHealth <= 0)
         {
@@ -143,6 +169,18 @@ public class StoneHealth : MonoBehaviour
                 // ------------------------------------------
             }
         }
+
+        // --- BURASI EKLENECEK ---
+        if (CoinAnimationManager.Instance != null)
+        {
+            // Taþýn olduðu yerden (transform.position) 5 tane altýn fýrlat
+            CoinAnimationManager.Instance.PlayCoinAnim(transform.position, 5);
+        }
+        else
+        {
+            Debug.LogWarning("CoinAnimationManager sahnede bulunamadý!");
+        }
+        // -------------------------
 
         if (deathEffect != null) Instantiate(deathEffect, transform.position, Quaternion.identity);
         Destroy(gameObject);

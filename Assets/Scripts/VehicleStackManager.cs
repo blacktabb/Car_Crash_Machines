@@ -18,7 +18,7 @@ public class VehicleStackManager : MonoBehaviour
 
     [Header("Ayarlar")]
     public float carHeight = 0.5f;
-    public int maxWeaponCount = 6;
+    public int maxWeaponCount = 8;
     public List<VehicleWeapon> carStack = new List<VehicleWeapon>();
 
     [Header("Hasar Ayarları")]
@@ -58,6 +58,13 @@ public class VehicleStackManager : MonoBehaviour
     [Header("Perk Manager")]
     public float tempGoldMultiplier = 1.0f;
 
+    [Header("Güvenlik Alanı")]
+    public float reviveClearRadius = 10f; // Yatay genişlik (Kapsülün kalınlığı)
+    public float damageClearRadius = 3f;
+    public float clearHeight = 20f;
+
+
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -73,6 +80,15 @@ public class VehicleStackManager : MonoBehaviour
         UpdateHealthUI();
         SpawnWeapon();
         UpdateUI();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            AddMoney(1000); // Mevcut AddMoney fonksiyonunu çağırıyoruz
+            Debug.Log("CHEAT: 1000 Altın eklendi!");
+        }
     }
 
     void SaveGameData()
@@ -119,6 +135,7 @@ public class VehicleStackManager : MonoBehaviour
 
         if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
         if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.1f);
+
         // Çarpan taş yok olacağı için LevelManager'a haber veriyoruz
         if (LevelManager.Instance != null)
         {
@@ -126,6 +143,8 @@ public class VehicleStackManager : MonoBehaviour
         }
 
         Destroy(stoneObj);
+
+        DestroyNearbyStones(damageClearRadius); // Hasar alınca etrafı temizle (3m)
 
         if (currentHealth <= 0) GameOver();
     }
@@ -147,19 +166,13 @@ public class VehicleStackManager : MonoBehaviour
     // Hangisi küçükse onu döndürür. Böylece UI doğru çalışır.
     int GetEffectiveLimit()
     {
-        // 1. Satın alınan kapasite (Upgrade)
+        // 1. Kapasite Hesabı: Başlangıç (4) + Satın Alınan Upgrade
+        // "Upg_MaxStack" her upgrade alındığında 1 artıyor varsayıyoruz.
         int purchasedLimit = 4 + PlayerPrefs.GetInt("Upg_MaxStack", 0);
 
-        // 2. Levelin tavan yüksekliği (Level Generator'dan gelir)
-        int levelLimit = 100; // Varsayılan yüksek değer
-        if (LevelGenerator.Instance != null)
-        {
-            levelLimit = LevelGenerator.Instance.CurrentLevelMaxHeight;
-        }
-
-        // 3. Oyunun mutlak sınırı (maxWeaponCount) ile de kıyasla
-        // (Hangisi en küçükse o geçerlidir)
-        return Mathf.Min(purchasedLimit, levelLimit, maxWeaponCount);
+        // 2. Mutlak Sınır Kontrolü
+        // Hesaplanan limit 8'i geçerse, 8'de dursun.
+        return Mathf.Min(purchasedLimit, maxWeaponCount);
     }
 
     // --- SATIN ALMA ---
@@ -371,6 +384,7 @@ public class VehicleStackManager : MonoBehaviour
         isGameOver = false; 
         UpdateHealthUI();
         UpdateUI();
+        DestroyNearbyStones(reviveClearRadius); // Doğunca etrafı temizle (10m)
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (LevelManager.Instance != null)
             LevelManager.Instance.ResumeAfterRevive();
@@ -391,5 +405,51 @@ public class VehicleStackManager : MonoBehaviour
             if (carStack[i].level == carStack[i + 1].level) return true;
         return false;
     }
-    public void GoToMainMenu() { Time.timeScale = 1f; SceneManager.LoadScene("MainMenu"); }
+
+    // VehicleStackManager.cs'nin içine, en alta ekle:
+    public int GetHealth()
+    {
+        return currentHealth;
+    }
+
+    // --- ALAN TEMİZLEME FONKSİYONU ---
+    public void DestroyNearbyStones(float radius)
+    {
+        // 1. Belirlenen yarıçapta bir küre oluştur ve çarpanları bul
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
+
+        foreach (var hit in hitColliders)
+        {
+            // 2. Sadece "Stone" etiketli olanları seç
+            if (hit.CompareTag("Stone"))
+            {
+                // 3. Efekt varsa patlat (Görsel şölen)
+                if (hitParticlePrefab != null)
+                {
+                    Instantiate(hitParticlePrefab, hit.transform.position, Quaternion.identity);
+                }
+
+                // 4. Level İlerlemesine Katkı Sağlasın (İstersen kapatabilirsin)
+                if (LevelManager.Instance != null)
+                {
+                    LevelManager.Instance.AddProgress(1);
+                }
+
+                // 5. Taşı Yok Et
+                Destroy(hit.gameObject);
+            }
+        }
+
+        Debug.Log($"Alan Temizlendi! Yarıçap: {radius}");
+    }
+
+    // Editörde yarıçapı görebilmek için (Gizmos)
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, reviveClearRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, damageClearRadius);
+    }
 }

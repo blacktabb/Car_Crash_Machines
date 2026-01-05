@@ -12,10 +12,17 @@ public class SpecialStone : MonoBehaviour
     public float explosionRadius = 2.0f;
     public int explosionDamage = 5;
     public GameObject explosionEffect;
+
+    // --- YENÝ: TÝTREME AYARLARI ---
+    [Header("Dinamit Titreme Ayarlarý")]
+    public float shakeDuration = 0.5f;   // Ne kadar sürsün?
+    public float shakeMagnitude = 0.5f;  // Ne kadar þiddetli olsun?
+                                         // ------------------------------
+
     private bool isTriggered = false;
 
     [Header("Sandýk Ayarlarý")]
-    public int goldAmount = 10; // Normal taþtan fazla olsun (Örn: Taþ 5 ise bu 50 olsun)
+    public int goldAmount = 10;
     public GameObject goldPopupPrefab;
 
     public void ActivateSpecialEffect()
@@ -37,9 +44,22 @@ public class SpecialStone : MonoBehaviour
 
     void Explode()
     {
+        // 1. GÖRSEL EFEKT
         if (explosionEffect != null)
             Instantiate(explosionEffect, transform.position, Quaternion.identity);
 
+        // 2. KAMERA TÝTREMESÝ (YENÝ KISIM)
+        // Sahnedeki "MainCamera" etiketli kamerayý bulur ve üzerindeki scripti çalýþtýrýr.
+        if (Camera.main != null)
+        {
+            CameraShake shaker = Camera.main.GetComponent<CameraShake>();
+            if (shaker != null)
+            {
+                shaker.TriggerShake(shakeDuration, shakeMagnitude);
+            }
+        }
+
+        // 3. HASAR VERME
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (var hitCollider in hitColliders)
         {
@@ -54,26 +74,23 @@ public class SpecialStone : MonoBehaviour
                 }
             }
         }
+
+        // Dinamit iþini bitirince kendini yok etsin mi? 
+        // Genelde patladýktan sonra yok olmasý gerekir.
+        Destroy(gameObject);
     }
 
     void OpenChest()
     {
-        // --- DEÐÝÞÝKLÝK BURADA ---
-        // Artýk LevelManager'da biriktirmiyoruz.
-        // Direkt ana para yöneticisine (Cüzdana) ekliyoruz.
-        // VehicleStackManager.AddMoney zaten "Save" iþlemini yapýyor.
-
         if (VehicleStackManager.Instance != null)
         {
             VehicleStackManager.Instance.AddMoney(goldAmount);
         }
-        // -------------------------
 
-        // Görsel efekt
         if (goldPopupPrefab != null)
         {
             GameObject popup = Instantiate(goldPopupPrefab, transform.position + Vector3.up * 2, Quaternion.identity);
-            TextMeshPro textMesh = popup.GetComponent<TextMeshPro>(); // Veya TMP_Text
+            TextMeshPro textMesh = popup.GetComponent<TextMeshPro>();
             if (textMesh != null)
             {
                 textMesh.text = "+" + goldAmount + " G";
@@ -81,8 +98,9 @@ public class SpecialStone : MonoBehaviour
                 textMesh.fontSize = 6;
             }
         }
+        if (explosionEffect != null)
+            Instantiate(explosionEffect, transform.position, Quaternion.identity);
 
-        // Sandýk açýlýnca kendisini yok etsin (Görsel olarak)
         Destroy(gameObject);
     }
 
