@@ -114,4 +114,23 @@ public class OptimizationManager : MonoBehaviour
         }
         */
     }
+
+    // --- EKSÝK OLAN FONKSÝYON: TÜM TAÞLARI TEMÝZLE ---
+    // Level deðiþirken eski taþlarý silmek için kullanýyoruz.
+    public void ClearAllStones()
+    {
+        // 1. Sahnedeki tüm taþlarý yok et
+        foreach (var stone in allStones)
+        {
+            if (stone.obj != null)
+            {
+                Destroy(stone.obj);
+            }
+        }
+
+        // 2. Listeyi boþalt
+        allStones.Clear();
+
+        Debug.Log("OptimizationManager: Tüm taþlar temizlendi.");
+    }
 }

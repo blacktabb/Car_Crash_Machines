@@ -44,6 +44,10 @@ public class SpecialStone : MonoBehaviour
 
     void Explode()
     {
+        // --- SES EKLE ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayExplosion();
+        // ----------------
+
         // 1. GÖRSEL EFEKT
         if (explosionEffect != null)
             Instantiate(explosionEffect, transform.position, Quaternion.identity);

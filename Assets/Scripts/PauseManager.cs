@@ -9,7 +9,7 @@ public class PauseManager : MonoBehaviour
     [SerializeField] GameObject confirmResetProgressPanel;
     bool isPaused;
 
-    [Header("Sound")]
+    [Header("Sound (SFX Only)")]
     [SerializeField] Image soundButtonImage;
     [SerializeField] Sprite soundOnSprite;
     [SerializeField] Sprite soundOffSprite;
@@ -18,9 +18,10 @@ public class PauseManager : MonoBehaviour
 
     void Start()
     {
-        // Pause
-        pausePanel.SetActive(false);
-        confirmResetProgressPanel.SetActive(false);
+        // Pause Baþlangýç Ayarlarý
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (confirmResetProgressPanel != null) confirmResetProgressPanel.SetActive(false);
+
         isPaused = false;
         Time.timeScale = 1f;
 
@@ -33,14 +34,14 @@ public class PauseManager : MonoBehaviour
 
     public void PauseGame()
     {
-        pausePanel.SetActive(true);
+        if (pausePanel != null) pausePanel.SetActive(true);
         Time.timeScale = 0f;
         isPaused = true;
     }
 
     public void ResumeGame()
     {
-        pausePanel.SetActive(false);
+        if (pausePanel != null) pausePanel.SetActive(false);
         Time.timeScale = 1f;
         isPaused = false;
     }
@@ -53,7 +54,7 @@ public class PauseManager : MonoBehaviour
             PauseGame();
     }
 
-    // ---------------- SOUND ----------------
+    // ---------------- SOUND (SADECE EFEKT) ----------------
 
     public void ToggleSound()
     {
@@ -66,24 +67,38 @@ public class PauseManager : MonoBehaviour
 
     void ApplySoundState()
     {
-        AudioListener.volume = isSoundOn ? 1f : 0f;
-        soundButtonImage.sprite = isSoundOn ? soundOnSprite : soundOffSprite;
+        // --- DÜZELTME BURADA ---
+        // Eskiden: AudioListener.volume = ... (Hepsini kapatýyordu)
+        // Þimdi: Sadece AudioManager'daki SFX kanalýný kapatýyoruz.
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXState(isSoundOn);
+        }
+
+        if (soundButtonImage != null)
+        {
+            soundButtonImage.sprite = isSoundOn ? soundOnSprite : soundOffSprite;
+        }
     }
 
     // ---------------- RESET ----------------
 
     public void ConfirmResetProgress()
     {
-        confirmResetProgressPanel.SetActive(true);
+        if (confirmResetProgressPanel != null) confirmResetProgressPanel.SetActive(true);
     }
     public void CancelResetProgress()
     {
-        confirmResetProgressPanel.SetActive(false);
+        if (confirmResetProgressPanel != null) confirmResetProgressPanel.SetActive(false);
     }
     public void ResetProgress()
     {
         Debug.Log("TÜM ÝLERLEME SÝLÝNÝYOR... SIFIRDAN BAÞLATILIYOR.");
         PlayerPrefs.DeleteAll();
+
+        // Reset sonrasý baþlangýç parasý ve ayarlarý (LevelManager'daki gibi)
+        PlayerPrefs.SetInt("PlayerMoney", 150);
         PlayerPrefs.Save();
 
         Time.timeScale = 1f;

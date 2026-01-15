@@ -176,7 +176,11 @@ public class LevelManager : MonoBehaviour
     }
 
     void LevelComplete()
-    {     
+    {
+        // Ses efekti oynat
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayWin();
+        // ...
+
         PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
         PlayerPrefs.Save();
 
@@ -188,6 +192,10 @@ public class LevelManager : MonoBehaviour
 
     public void HandleLevelFailed()
     {
+        // ses efekti oynat
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayLose();
+        // ...
+
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
     }

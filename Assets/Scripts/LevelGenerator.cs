@@ -7,16 +7,35 @@ public class LevelGenerator : MonoBehaviour
     public struct LevelTheme
     {
         public string themeName;
+
+        [Header("Çevre Materyalleri (YENÝ)")]
+        public Material groundMaterial;      // Ana zemin (Yol)
+        public Material groundSideMaterial;  // Zeminin yan yüzeyi (Varsa)
+        public Material backgroundMaterial;  // Arkadaki büyük plane (Texture deðiþecek dediðin kýsým)
+        public Material sideWallMaterial;    // Yan taraftaki duvar/plane
+
         [Header("Özel Bölge Taþlarý")]
         public GameObject[] topStonePrefabs;
+
         [Header("Standart Taþlar")]
         public GameObject[] smallStones;
         public GameObject[] bigStones;
         public GameObject[] rareStones;
+
+        [Header("Gökyüzü")]
+        public Material skyboxMaterial;
     }
 
     [Header("Tema Sistemi")]
     public LevelTheme[] themes;
+
+    [Header("Sahne Objeleri (Referanslar)")]
+    // Unity Inspector'dan sahnendeki objeleri buraya sürükleyeceksin
+    public Renderer groundRenderer;      // Yürüdüðümüz yolun Renderer'ý
+    public Renderer groundSideRenderer;  // Yolun yanýndaki süsün Renderer'ý
+    public Renderer backgroundRenderer;  // Arkaplan Plane'inin Renderer'ý
+    public Renderer sideWallRenderer;    // Yan duvarýn Renderer'ý
+    public Light directionalLight; // Ana ýþýk kaynaðý (Güneþ)
 
     [Header("Görsel Ayarlar")]
     public int topLayerCount = 1;
@@ -33,7 +52,6 @@ public class LevelGenerator : MonoBehaviour
     public int maxLevelLength = 250;       // Max sýnýr
 
     [Header("Debug (Sadece Ýzleme Ýçin)")]
-    // Inspector'da elle deðiþtirme, oyun hesaplar.
     public int currentCalculatedLength;
 
     public static LevelGenerator Instance;
@@ -87,6 +105,66 @@ public class LevelGenerator : MonoBehaviour
     }
     // ----------------------
 
+    // --- YENÝ EKLENEN FONKSÝYON: ÇEVREYÝ GÜNCELLE ---
+    void UpdateEnvironmentVisuals(LevelTheme theme)
+    {
+        // 1. Zemin Materyali
+        if (groundRenderer != null && theme.groundMaterial != null)
+            groundRenderer.material = theme.groundMaterial;
+
+        // 2. Zemin Yan Yüzeyi
+        if (groundSideRenderer != null && theme.groundSideMaterial != null)
+            groundSideRenderer.material = theme.groundSideMaterial;
+
+        // 3. Arkaplan
+        if (backgroundRenderer != null && theme.backgroundMaterial != null)
+            backgroundRenderer.material = theme.backgroundMaterial;
+
+        // 4. Yan Duvar
+        if (sideWallRenderer != null && theme.sideWallMaterial != null)
+            sideWallRenderer.material = theme.sideWallMaterial;
+
+        // 5. Skybox
+        if (theme.skyboxMaterial != null)
+        {
+            RenderSettings.skybox = theme.skyboxMaterial;
+            DynamicGI.UpdateEnvironment(); // Iþýklandýrmayý skybox'a göre güncelle
+        }
+
+        // 6. Iþýk Rengi (Opsiyonel: Tema bazlý ýþýk rengi deðiþimi)
+        if (directionalLight != null)
+        {
+            // 0 ile 2PI arasýnda bir açý (Döngü için)
+            // currentLevel 1 iken 0 olsun istiyoruz.
+            float cycle = ((LevelManager.Instance.currentLevel - 1) % 20) / 20f * Mathf.PI * 2;
+
+            // Sinüs -1 ile 1 arasý deðer verir. Bunu 0.3 (Gece) ile 1.2 (Öðlen) arasýna haritalayalým.
+            // (Sinüs + 1) / 2 -> 0 ile 1 arasý deðer verir.
+            float intensity = 0.3f + (((Mathf.Cos(cycle) + 1f) / 2f) * 0.9f);
+
+            // Cosinus kullandýk çünkü level 1'de (cycle 0) en yüksek (gündüz) baþlasýn.
+
+            directionalLight.intensity = intensity;
+
+            // Ýstersen renk tonunu da deðiþtirebilirsin (Opsiyonel)
+            // directionalLight.color = Color.Lerp(Color.blue, Color.white, intensity);
+        }
+    }
+    // -----------------------------------------------
+
+    public void GenerateNewLevel()
+    {
+        if (OptimizationManager.Instance != null)
+        {
+            OptimizationManager.Instance.ClearAllStones();
+        }
+
+        CalculateLevelLength(); // Yeni uzunluðu hesapla
+        gridMap = new bool[currentCalculatedLength, absoluteMaxHeight + 5];
+        CalculateCurrentLevelMaxHeight();
+        GenerateGridAndSpawn();
+    }
+
     void GenerateGridAndSpawn()
     {
         int totalStonesSpawned = 0;
@@ -97,6 +175,10 @@ public class LevelGenerator : MonoBehaviour
 
         int themeIndex = (currentLevel - 1) % themes.Length;
         LevelTheme activeTheme = themes[themeIndex];
+
+        // --- ÇEVREYÝ BOYAMA ÝÞLEMÝNÝ ÇAÐIR ---
+        UpdateEnvironmentVisuals(activeTheme);
+        // -------------------------------------
 
         // Döngü hesaplanan uzunluðu kullanýyor
         for (int x = 0; x < currentCalculatedLength; x++)
@@ -155,8 +237,7 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        // --- HATA BURADAYDI, DÜZELTÝLDÝ ---
-        // levelLength yerine currentCalculatedLength yazýyoruz.
+        // Bitiþ çizgisi
         float endXPosition = CalculateWorldPos(currentCalculatedLength, 0).x + finishLineOffset;
 
         if (finishLinePrefab != null)
@@ -171,6 +252,7 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    // --- YARDIMCI FONKSÝYONLAR (AYNI) ---
     void SpawnStoneFromList(GameObject[] sourceList, int xIndex, int yIndex, bool isBig)
     {
         if (sourceList == null || sourceList.Length == 0) return;
@@ -228,7 +310,7 @@ public class LevelGenerator : MonoBehaviour
             levelBaseHP *= bossHPMultiplier;
         }
 
-        // currentCalculatedLength kullanarak oranla
+        // xIndex / currentCalculatedLength kullanarak oranla
         float progressPercent = (float)xIndex / (float)currentCalculatedLength;
         float distanceMultiplier = 1.0f + (progressPercent * 0.5f);
 
@@ -247,6 +329,5 @@ public class LevelGenerator : MonoBehaviour
         int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
         int calculatedMax = startMaxHeight + ((currentLevel - 1) / increaseEveryXLevel);
         CurrentLevelMaxHeight = Mathf.Clamp(calculatedMax, startMaxHeight, absoluteMaxHeight);
-        Debug.Log($"LEVEL: {currentLevel} | HESAPLANAN TAVAN YÜKSEKLÝÐÝ: {CurrentLevelMaxHeight}");
     }
 }

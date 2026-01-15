@@ -234,6 +234,11 @@ public class VehicleStackManager : MonoBehaviour
                 isMerging = true;
                 yield return StartCoroutine(topCar.MoveAndMerge(bottomCar.transform.localPosition));
                 if (mergeEffectPrefab != null) Instantiate(mergeEffectPrefab, bottomCar.transform.position, Quaternion.identity);
+                
+                // --- SES EKLE ---
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayMerge();
+                // ----------------
+
                 bottomCar.LevelUp();
                 if (topCar != null) Destroy(topCar.gameObject);
                 carStack.RemoveAt(i + 1);

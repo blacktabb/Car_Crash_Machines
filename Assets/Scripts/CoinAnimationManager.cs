@@ -114,6 +114,10 @@ public class CoinAnimationManager : MonoBehaviour
         if (targetLogo != null)
         {
             StartCoroutine(PunchEffect(targetLogo));
+
+            // --- SES EKLE ---
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayCoin();
+            // ----------------
         }
 
         if (coinTrans != null)

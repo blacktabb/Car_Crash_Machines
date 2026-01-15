@@ -99,6 +99,10 @@ public class VehicleWeapon : MonoBehaviour
     {
         if (bulletPrefab == null || firePoint == null) return;
 
+        // --- SES EKLE ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayShoot();
+        // ----------------
+
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         BulletController bulletScript = bullet.GetComponent<BulletController>();
 
@@ -176,14 +180,15 @@ public class VehicleWeapon : MonoBehaviour
 
     IEnumerator PlaySpawnAnimation()
     {
+        Vector3 targetScale = transform.localScale;
         transform.localScale = Vector3.zero;
         float timer = 0f;
         while (timer < 0.3f)
         {
             timer += Time.deltaTime;
-            transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, timer / 0.3f);
+            transform.localScale = Vector3.Lerp(Vector3.zero, targetScale, timer / 0.3f);
             yield return null;
         }
-        transform.localScale = Vector3.one;
+        transform.localScale = targetScale;
     }
 }

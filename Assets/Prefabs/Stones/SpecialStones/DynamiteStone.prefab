@@ -106,9 +106,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoneType: 0
-  explosionRadius: 1
-  explosionDamage: 15
+  explosionRadius: 3
+  explosionDamage: 100
   explosionEffect: {fileID: 100008, guid: f55f0defa3c68c1498d7f9cae620bc19, type: 3}
+  shakeDuration: 0.3
+  shakeMagnitude: 0.3
   goldAmount: 0
   goldPopupPrefab: {fileID: 0}
 --- !u!54 &4912820335978121023
