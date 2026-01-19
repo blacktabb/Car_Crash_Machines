@@ -27,6 +27,7 @@ public class VehicleStackManager : MonoBehaviour
 
     [Header("ÖNEMLİ: Modeller")]
     public GameObject baseWeaponContainer;
+    public GameObject baseBulletContainer;
     public GameObject[] weaponModels;
 
     [Header("Ekonomi (Kayıtlı)")]
@@ -199,6 +200,19 @@ public class VehicleStackManager : MonoBehaviour
     void SpawnWeapon()
     {
         if (baseWeaponContainer != null)
+        {
+            GameObject newCarObj = Instantiate(baseWeaponContainer, transform);
+            VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();
+            newCarScript.level = 1;
+            carStack.Add(newCarScript);
+            UpdatePositions();
+            UpdateUI();
+        }
+    }
+
+    void SpawnBullet()
+    {
+        if (baseBulletContainer != null)
         {
             GameObject newCarObj = Instantiate(baseWeaponContainer, transform);
             VehicleWeapon newCarScript = newCarObj.GetComponent<VehicleWeapon>();

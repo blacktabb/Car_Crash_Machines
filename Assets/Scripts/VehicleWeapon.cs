@@ -13,7 +13,11 @@ public class VehicleWeapon : MonoBehaviour
     public float damageMultiplierPerMerge = 1.20f;
 
     [Header("Görseller & Referanslar")]
-    public GameObject bulletPrefab;
+    public GameObject bulletPrefab; // Varsayýlan/Fallback mermi
+    // --- YENÝ: MERMÝ LÝSTESÝ (Artýk silah kendi mermilerini biliyor) ---
+    public GameObject[] bulletPrefabs;
+    // ------------------------------------------------------------------
+
     public Transform firePoint;
     public GameObject mergeEffect;
     public Animator animator;
@@ -37,17 +41,11 @@ public class VehicleWeapon : MonoBehaviour
 
     void Update()
     {
-        // --- YENÝ EKLENEN KISIM: FREN SÝSTEMÝ ---
-        // Eðer GameManager yoksa veya Oyun Hýzý 0 veya daha az ise
-        // Yani "Tap to Play" ekranýndaysak veya oyun durduysa ATEÞ ETME.
         if (GameManager.Instance == null || GameManager.Instance.gameSpeed <= 0f)
             return;
-        // ----------------------------------------
 
         HandleShooting();
     }
-
-    // ... (Kodun geri kalaný aynen devam ediyor) ...
 
     public void UpdateVisuals()
     {
@@ -97,13 +95,31 @@ public class VehicleWeapon : MonoBehaviour
 
     void Shoot()
     {
-        if (bulletPrefab == null || firePoint == null) return;
+        if (firePoint == null) return;
 
-        // --- SES EKLE ---
+        // --- MERMÝ SEÇÝMÝ (YEREL LÝSTE) ---
+        GameObject prefabToSpawn = bulletPrefab; // Varsayýlan
+
+        if (bulletPrefabs != null && bulletPrefabs.Length > 0)
+        {
+            // Level 1 -> Index 0, Level 2 -> Index 1, Level 4 -> Index 2...
+            // Log2 mantýðý ile index bulma
+            int index = (level == 1) ? 0 : (int)Mathf.Log(level, 2);
+
+            // Eðer liste sýnýrýný aþarsa sonuncu mermiyi kullan
+            if (index >= bulletPrefabs.Length)
+                index = bulletPrefabs.Length - 1;
+
+            if (bulletPrefabs[index] != null)
+                prefabToSpawn = bulletPrefabs[index];
+        }
+
+        if (prefabToSpawn == null) return;
+        // ----------------------------------
+
         if (AudioManager.Instance != null) AudioManager.Instance.PlayShoot();
-        // ----------------
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        GameObject bullet = Instantiate(prefabToSpawn, firePoint.position, prefabToSpawn.transform.rotation);
         BulletController bulletScript = bullet.GetComponent<BulletController>();
 
         if (bulletScript != null)

@@ -4,9 +4,9 @@ public class BulletController : MonoBehaviour
 {
     [Header("Mermi Ayarlarý")]
     public float speed = 10f;
-    public float maxRange = 15f; // MENZÝL AYARI: Mermi kaç metre gidecek?
+    public float maxRange = 15f;
 
-    private Vector3 startPosition; // Merminin doðduðu yer
+    private Vector3 startPosition;
     private float damage;
     private bool isCriticalHit = false;
 
@@ -14,7 +14,6 @@ public class BulletController : MonoBehaviour
 
     void Start()
     {
-        // Mermi oluþtuðu an, nerede doðduðunu kaydediyoruz
         startPosition = transform.position;
     }
 
@@ -26,21 +25,24 @@ public class BulletController : MonoBehaviour
 
     void Update()
     {
-        // 1. HAREKET (Saða Doðru)
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        // Oyun durduysa hareket etme
+        if (GameManager.Instance == null || GameManager.Instance.gameSpeed <= 0f)
+            return;
 
-        // 2. MENZÝL KONTROLÜ (YENÝ SÝSTEM)
-        // Þu anki konum ile Baþlangýç konumu arasýndaki mesafeyi ölçüyoruz.
+        // --- DÜZELTME BURADA ---
+        // Space.World ekleyerek merminin dönüþü ne olursa olsun
+        // DÜNYA KOORDÝNATLARINDA SAÐA gitmesini saðlýyoruz.
+        transform.Translate(Vector3.right * speed * Time.deltaTime, Space.World);
+        // -----------------------
+
+        // Menzil Kontrolü
         float distanceTraveled = Vector3.Distance(startPosition, transform.position);
-
-        // Eðer mesafe, belirlediðimiz menzili geçtiyse mermiyi yok et
         if (distanceTraveled >= maxRange)
         {
             Destroy(gameObject);
         }
     }
 
-    // 3. ÇARPIÞMA (Aynen Kalýyor)
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Stone"))
@@ -48,12 +50,8 @@ public class BulletController : MonoBehaviour
             StoneHealth stone = other.GetComponent<StoneHealth>();
             if (stone != null)
             {
-                // Sadece hasar verisini gönderiyoruz (float olarak)
-                // Popup çýkarma iþini artýk StoneHealth.cs içindeki TakeDamage fonksiyonu yapýyor.
                 stone.TakeDamage(damage, isCriticalHit);
             }
-
-            // Mermiyi yok et
             Destroy(gameObject);
         }
     }

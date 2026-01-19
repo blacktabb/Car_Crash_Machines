@@ -67,8 +67,8 @@ public class LevelGenerator : MonoBehaviour
     [Range(0f, 1f)] public float rareStoneChance = 0.05f;
 
     [Header("Zorluk Ayarlarý")]
-    public int baseHealth = 3;
-    public float levelMultiplier = 2.5f;
+    public int baseHealth = 2;
+    public float levelMultiplier = 1.5f;
     public int bigStoneHealthMult = 3;
 
     [Header("Bitiþ Ayarlarý")]
