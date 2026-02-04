@@ -246,7 +246,7 @@ MonoBehaviour:
   goldValue: 1
   damagePopupPrefab: {fileID: 3995854055235832005, guid: b889bccfe0f1e48488d453ee4da957fb, type: 3}
   goldPopupPrefab: {fileID: 3995854055235832005, guid: 2d319dea684400547a7fac59ddebadbb, type: 3}
-  deathEffect: {fileID: 6631328132968268246, guid: fe1d595400d82df49a4cc04de599ad86, type: 3}
+  deathEffect: {fileID: 100000, guid: 83cd9cc9f9c88824ba18dc59b05ae328, type: 3}
   stoneRenderer: {fileID: 2950584654412674724}
   hitColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   recoverySpeed: 20

@@ -1,5 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
@@ -22,24 +23,33 @@ public class UpgradeManager : MonoBehaviour
     public UpgradeSlotUI slot_GoldGain;
 
     [Header("Upgrade Maliyetleri (Fiyat)")]
-    public int baseCost_Atk = 40; public int costInc_Atk = 40;
-    public int baseCost_Spd = 10; public int costInc_Spd = 5;
-    public int baseCost_CritRate = 10; public int costInc_CritRate = 5;
-    public int baseCost_CritDmg = 15; public int costInc_CritDmg = 15;
+    public int baseCost_Atk = 40; public int costInc_Atk = 60;
+    public int baseCost_Spd = 15; public int costInc_Spd = 30;
+    public int baseCost_CritRate = 20; public int costInc_CritRate = 10;
+    public int baseCost_CritDmg = 35; public int costInc_CritDmg = 20;
     public int baseCost_HP = 150; public int costInc_HP = 150;
     public int baseCost_Stack = 200; public int costInc_Stack = 250;
-    public int baseCost_Gold = 15; public int costInc_Gold = 10;
+    public int baseCost_Gold = 30; public int costInc_Gold = 15;
 
     [Header("Upgrade Deðerleri")]
-    public float incValue_Atk = 0.3f;
-    public float incValue_Spd = 0.1f;
+    public float incValue_Atk = 1f;
+    public float incValue_Spd = 0.2f;
     public float incValue_CritRate = 1f;
     public float incValue_CritDmg = 0.2f;
-    public int incValue_Gold = 1;
+    public int incValue_Gold = 2;
 
     // --- LÝMÝTLER ---
     private int absoluteMaxLimit_Stack = 8; // Silah slotu limiti
     private int maxLevel_CritRate = 30;     // Crit Rate limiti (YENÝ)
+
+    private string[] randomUpgradeCandidates = new string[]
+    {
+        "Upg_AtkPower",
+        "Upg_AtkSpeed",
+        "Upg_CritRate",
+        "Upg_CritDmg",
+        "Upg_GoldGain"
+    };
 
     void Start()
     {
@@ -52,31 +62,31 @@ public class UpgradeManager : MonoBehaviour
 
         // 1. ATTACK POWER (Sýnýr yok)
         CalculateAndSetSlot(slot_AtkPower, "Upg_AtkPower", baseCost_Atk, costInc_Atk, currentGold,
-            $"Increases damage by {incValue_Atk}");
+            $"Increases attack damage \n+{incValue_Atk}");
 
         // 2. ATTACK SPEED (Sýnýr yok)
         CalculateAndSetSlot(slot_AtkSpeed, "Upg_AtkSpeed", baseCost_Spd, costInc_Spd, currentGold,
-            $"Increases speed by {incValue_Spd}");
+            $"Increases attack speed \n+{incValue_Spd}");
 
         // 3. CRIT RATE (Max Level 30 Sýnýrý Var!)
         // Buraya 'maxLevel_CritRate' deðiþkenini gönderiyoruz.
         CalculateAndSetSlot(slot_CritRate, "Upg_CritRate", baseCost_CritRate, costInc_CritRate, currentGold,
-            $"Increases crit chance by %{incValue_CritRate}", maxLevel_CritRate);
+            $"Increases critical chance \n+%{incValue_CritRate}", maxLevel_CritRate);
 
         // 4. CRIT DMG (Sýnýr yok)
         CalculateAndSetSlot(slot_CritDmg, "Upg_CritDmg", baseCost_CritDmg, costInc_CritDmg, currentGold,
-            $"Increases crit damage by x{incValue_CritDmg}");
+            $"Increases critical damage \n+X{incValue_CritDmg}");
 
         // 5. MAX HEALTH (Sýnýr yok)
         CalculateAndSetSlot(slot_MaxHealth, "Upg_MaxHealth", baseCost_HP, costInc_HP, currentGold,
-            "Increases max health by 1 HP");
+            "Increases max health \n+1 HP");
 
         // 6. MAX STACK (Özel fonksiyonu var)
         UpdateMaxStackSlot(currentGold);
 
         // 7. GOLD GAIN (Sýnýr yok)
         CalculateAndSetSlot(slot_GoldGain, "Upg_GoldGain", baseCost_Gold, costInc_Gold, currentGold,
-            $"Increases gold per stone by {incValue_Gold}");
+            $"Increases won gold per stone \n+{incValue_Gold}");
     }
 
     // --- GÜNCELLENEN FONKSÝYON: MaxLevel Parametresi Eklendi ---
@@ -141,8 +151,60 @@ public class UpgradeManager : MonoBehaviour
             PlayerPrefs.SetInt(saveKey, currentLevel + 1);
             PlayerPrefs.Save();
             UpdateUI();
+
+            if (VehicleStackManager.Instance != null)
+            {
+                VehicleStackManager.Instance.PlayUpgradeEffect();
+            }
         }
+
+
     }
+
+    public void ApplyRandomFreeUpgrade()
+    {
+        // 1. Geçerli (Fullenmemiþ) Upgradeleri Bul
+        List<string> validKeys = new List<string>();
+
+        foreach (string key in randomUpgradeCandidates)
+        {
+            int currentLvl = PlayerPrefs.GetInt(key, 0);
+
+            // Eðer CritRate ise ve 30 olduysa listeye ekleme
+            if (key == "Upg_CritRate" && currentLvl >= maxLevel_CritRate)
+                continue;
+
+            // Diðerlerinde þu an sýnýr yok, listeye ekle
+            validKeys.Add(key);
+        }
+
+        // 2. Eðer yükseltilecek bir þey kalmadýysa (Nadir durum)
+        if (validKeys.Count == 0)
+        {
+            Debug.Log("Tüm rastgele upgradeler zaten MAX seviyede!");
+            return;
+        }
+
+        // 3. Rastgele Seç
+        string selectedKey = validKeys[Random.Range(0, validKeys.Count)];
+
+        // 4. ÜCRETSÝZ YÜKSELT (Para düþmeden level arttýr)
+        int lvl = PlayerPrefs.GetInt(selectedKey, 0);
+        PlayerPrefs.SetInt(selectedKey, lvl + 1);
+        PlayerPrefs.Save();
+
+        // 5. Görsel Efekt ve Güncelleme
+        UpdateUI();
+        if (VehicleStackManager.Instance != null)
+        {
+            VehicleStackManager.Instance.PlayUpgradeEffect();
+            PerkManager.Instance.isPerkActive = false; // Perk ekranýný kapat
+            PerkManager.Instance.perkPanel.SetActive(false);
+        }
+
+        Debug.Log($"REKLAM ÖDÜLÜ: {selectedKey} ücretsiz yükseltildi!");
+    }
+    // ----------------------------------------
 
     // --- BUTON BAÐLANTILARI ---
 

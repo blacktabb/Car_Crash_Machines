@@ -112,6 +112,8 @@ public class LevelManager : MonoBehaviour
         Debug.Log($"Hedef Belirlendi: {totalStoneCount} Taþ");
     }
 
+
+
     // --- TAÞLAR KIRILINCA ---
     public void AddProgress(int amount)
     {
@@ -230,9 +232,59 @@ public class LevelManager : MonoBehaviour
 
     public void NextLevel()
     {
+        int adCounter = PlayerPrefs.GetInt("AdCounter", 0);
+        adCounter++;
+
+        if (adCounter >= 2)
+        {
+            Debug.Log("2 Level geçildi, reklam kontrol ediliyor...");
+            
+            // 1. Önce Instance'ý dene
+            CrazyGamesManager cgManager = CrazyGamesManager.Instance;
+
+            // 2. Instance yoksa, sahnede manuel ara (Yedek Plan)
+            if (cgManager == null)
+            {
+                cgManager = FindFirstObjectByType<CrazyGamesManager>();
+            }
+
+            // 3. Kontrol ve Çalýþtýrma
+            if (cgManager != null)
+            {
+                cgManager.ShowMidgameAd(() => 
+                {
+                    LoadNextSceneLogic(); 
+                });
+                
+                PlayerPrefs.SetInt("AdCounter", 0);
+            }
+            else
+            {
+                // Reklam yöneticisi sahnede HÝÇ YOKSA oyunu dondurma, direkt geç
+                Debug.LogWarning("CrazyGamesManager sahnede bulunamadý! Reklam gösterilmeden devam ediliyor.");
+                LoadNextSceneLogic();
+            }
+        }
+        else
+        {
+            Debug.Log($"Reklam yok. Sayaç: {adCounter}/2");
+            PlayerPrefs.SetInt("AdCounter", adCounter);
+            PlayerPrefs.Save();
+            LoadNextSceneLogic();
+        }
+    }
+
+    void LoadNextSceneLogic()
+    {
+        currentLevel++;
+        PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+        ResetPriceData();
+        PlayerPrefs.Save();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene("SampleScene");
     }
+    // -----------------------------
 
     public void ResumeAfterRevive()
     {

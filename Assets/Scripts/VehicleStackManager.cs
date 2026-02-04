@@ -53,8 +53,10 @@ public class VehicleStackManager : MonoBehaviour
     public Sprite Heart;
 
     public GameObject hitParticlePrefab;
+    public GameObject damageReceivedFX;
     public CameraShake cameraShake;
     public GameObject mergeEffectPrefab;
+    public GameObject upgradeFX;
 
     [Header("Perk Manager")]
     public float tempGoldMultiplier = 1.0f;
@@ -133,8 +135,20 @@ public class VehicleStackManager : MonoBehaviour
     {
         currentHealth--;
         UpdateHealthUI();
-
+        // 1. Taş çarpma efekti
         if (hitParticlePrefab != null) Instantiate(hitParticlePrefab, stoneObj.transform.position, Quaternion.identity);
+        // 2. --- YENİ: OYUNCU ÜZERİNDE HASAR EFEKTİ ---
+        if (damageReceivedFX != null)
+        {
+            // Pozisyon: Y (0.5) ile yerden hafif yüksek, Z (-1) ile kameraya daha yakın
+            Vector3 spawnPos = transform.position + new Vector3(-2f, 3f, -1f);
+
+            // Rotasyon: Kameraya doğru (Geriye) bakacak şekilde ayarla
+            Quaternion spawnRot = Quaternion.LookRotation(Vector3.back);
+
+            Instantiate(damageReceivedFX, spawnPos, spawnRot);
+        }
+        // 3. Kamera sarsıntısı
         if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.1f);
 
         // Çarpan taş yok olacağı için LevelManager'a haber veriyoruz
@@ -148,6 +162,18 @@ public class VehicleStackManager : MonoBehaviour
         DestroyNearbyStones(damageClearRadius); // Hasar alınca etrafı temizle (3m)
 
         if (currentHealth <= 0) GameOver();
+    }
+
+    public void PlayUpgradeEffect()
+    {
+        if (upgradeFX != null)
+        {
+            // Hasar efektiyle aynı mantık: Kameraya dönük ve oyuncunun önünde
+            Vector3 spawnPos = transform.position + new Vector3(-2f, 3f, -1f);
+            Quaternion spawnRot = Quaternion.LookRotation(Vector3.back);
+
+            Instantiate(upgradeFX, spawnPos, spawnRot);
+        }
     }
 
     void GameOver()

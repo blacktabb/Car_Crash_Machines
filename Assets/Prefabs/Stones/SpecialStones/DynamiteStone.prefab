@@ -108,7 +108,7 @@ MonoBehaviour:
   stoneType: 0
   explosionRadius: 3
   explosionDamage: 100
-  explosionEffect: {fileID: 100008, guid: f55f0defa3c68c1498d7f9cae620bc19, type: 3}
+  explosionEffect: {fileID: 1892078723244562, guid: 46876a2780737ec45a19d62f88e5ce56, type: 3}
   shakeDuration: 0.3
   shakeMagnitude: 0.3
   goldAmount: 0

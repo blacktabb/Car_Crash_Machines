@@ -18,7 +18,7 @@ public class PerkManager : MonoBehaviour
     }
 
     // 1. DEÐÝÞÝKLÝK: Yeni tipi buraya ekledik (UpgradeLowest)
-    public enum PerkType { DamageBoost, FireRateBoost, CritChanceBoost, GoldBoost, UpgradeLowest }
+    public enum PerkType { DamageBoost, FireRateBoost, CritChanceBoost, GoldBoost, UpgradeLowest, RandomFreeUpgrade }
 
     [Header("Ayarlar")]
     public GameObject perkPanel;
@@ -64,6 +64,7 @@ public class PerkManager : MonoBehaviour
     public void ApplyPerk(PerkData perk)
     {
         VehicleStackManager stackManager = Object.FindFirstObjectByType<VehicleStackManager>();
+        UpgradeManager upgradeManager = Object.FindFirstObjectByType<UpgradeManager>();
 
         if (stackManager != null)
         {
@@ -79,7 +80,7 @@ public class PerkManager : MonoBehaviour
                 stackManager.UpgradeLowestLevelWeapon();
             }
             // C) EÐER STAT (HASAR/HIZ) BOOST ÝSE:
-            else
+            else 
             {
                 foreach (VehicleWeapon weapon in stackManager.carStack)
                 {

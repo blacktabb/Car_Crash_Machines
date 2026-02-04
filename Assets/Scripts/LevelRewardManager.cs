@@ -72,4 +72,5 @@ public class LevelRewardManager : MonoBehaviour
     public void AdFreeGold() { VehicleStackManager.Instance.AddMoney(100); RewardButtons.Instance.HideCurrent(); }
     public void AdActivateSlow() { GameManager.Instance.SlowGame(15f); RewardButtons.Instance.HideCurrent(); }
     public void AdFreeHealth() { VehicleStackManager.Instance.AddHealth(); RewardButtons.Instance.HideCurrent(); }
+    public void RandomFreeUpgrade() { UpgradeManager.Instance.ApplyRandomFreeUpgrade(); RewardButtons.Instance.HideCurrent(); }
 }

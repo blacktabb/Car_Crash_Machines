@@ -1,11 +1,13 @@
 using UnityEngine;
 using CrazyGames; // Kütüphane ekli olmalý
+using System;
 
 public class CrazyGamesManager : MonoBehaviour
 {
     // Butona baðlayacaðýn fonksiyon (Ödüllü Reklam)
     [SerializeField] public LevelRewardManager levelRewardManager;
     private string chosenReward;
+    public static CrazyGamesManager Instance;
     // Oyun açýlýr açýlmaz (Start'tan bile önce) burasý çalýþýr
     private void Awake()
     {
@@ -49,19 +51,26 @@ public class CrazyGamesManager : MonoBehaviour
     }
 
     // Geçiþ Reklamý (Interstitial)
-    public void GecisReklamiGoster()
+    public void ShowMidgameAd(Action onComplete = null)
     {
+        Debug.Log("Geçiþ reklamý isteniyor...");
+
         CrazySDK.Ad.RequestAd(CrazyAdType.Midgame,
             () => {
+                // Reklam Baþladý
                 Time.timeScale = 0f;
             },
             (error) => {
+                // Hata durumunda da oyunu devam ettirmeliyiz
                 Debug.LogError("Geçiþ reklamý hatasý: " + error);
                 Time.timeScale = 1f;
+                if (onComplete != null) onComplete();
             },
             () => {
+                // Reklam Bitti
                 Debug.Log("Geçiþ reklamý bitti.");
                 Time.timeScale = 1f;
+                if (onComplete != null) onComplete();
             }
         );
     }
@@ -90,11 +99,14 @@ public class CrazyGamesManager : MonoBehaviour
                 levelRewardManager.ActivateDoubleReward();
                 break;
 
+            case "RandomFreeUpgrade":
+                levelRewardManager.RandomFreeUpgrade();
+                break;
+
             default:
                 Debug.LogWarning("Bilinmeyen ödül türü: " + chosenReward);
                 break;                      
-        }
-        levelRewardManager.AdRevive();
+        }        
         Debug.Log("Tebrikler! Ödül hesabýna eklendi.");
     }
 }

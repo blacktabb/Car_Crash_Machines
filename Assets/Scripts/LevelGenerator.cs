@@ -8,12 +8,6 @@ public class LevelGenerator : MonoBehaviour
     {
         public string themeName;
 
-        [Header("Çevre Materyalleri (YENÝ)")]
-        public Material groundMaterial;      // Ana zemin (Yol)
-        public Material groundSideMaterial;  // Zeminin yan yüzeyi (Varsa)
-        public Material backgroundMaterial;  // Arkadaki büyük plane (Texture deðiþecek dediðin kýsým)
-        public Material sideWallMaterial;    // Yan taraftaki duvar/plane
-
         [Header("Özel Bölge Taþlarý")]
         public GameObject[] topStonePrefabs;
 
@@ -29,12 +23,7 @@ public class LevelGenerator : MonoBehaviour
     [Header("Tema Sistemi")]
     public LevelTheme[] themes;
 
-    [Header("Sahne Objeleri (Referanslar)")]
-    // Unity Inspector'dan sahnendeki objeleri buraya sürükleyeceksin
-    public Renderer groundRenderer;      // Yürüdüðümüz yolun Renderer'ý
-    public Renderer groundSideRenderer;  // Yolun yanýndaki süsün Renderer'ý
-    public Renderer backgroundRenderer;  // Arkaplan Plane'inin Renderer'ý
-    public Renderer sideWallRenderer;    // Yan duvarýn Renderer'ý
+    [Header("Light")]
     public Light directionalLight; // Ana ýþýk kaynaðý (Güneþ)
 
     [Header("Görsel Ayarlar")]
@@ -66,9 +55,10 @@ public class LevelGenerator : MonoBehaviour
     [Range(0f, 1f)] public float bigStoneChance = 0.3f;
     [Range(0f, 1f)] public float rareStoneChance = 0.05f;
 
-    [Header("Zorluk Ayarlarý")]
-    public int baseHealth = 2;
-    public float levelMultiplier = 1.5f;
+    [Header("Denge Ayarlarý")]
+    public float baseStoneHP = 5f;
+    public float hpGrowthFactor = 1.15f;
+    public float bossHPMultiplier = 2.0f;
     public int bigStoneHealthMult = 3;
 
     [Header("Bitiþ Ayarlarý")]
@@ -107,31 +97,8 @@ public class LevelGenerator : MonoBehaviour
 
     // --- YENÝ EKLENEN FONKSÝYON: ÇEVREYÝ GÜNCELLE ---
     void UpdateEnvironmentVisuals(LevelTheme theme)
-    {
-        // 1. Zemin Materyali
-        if (groundRenderer != null && theme.groundMaterial != null)
-            groundRenderer.material = theme.groundMaterial;
-
-        // 2. Zemin Yan Yüzeyi
-        if (groundSideRenderer != null && theme.groundSideMaterial != null)
-            groundSideRenderer.material = theme.groundSideMaterial;
-
-        // 3. Arkaplan
-        if (backgroundRenderer != null && theme.backgroundMaterial != null)
-            backgroundRenderer.material = theme.backgroundMaterial;
-
-        // 4. Yan Duvar
-        if (sideWallRenderer != null && theme.sideWallMaterial != null)
-            sideWallRenderer.material = theme.sideWallMaterial;
-
-        // 5. Skybox
-        if (theme.skyboxMaterial != null)
-        {
-            RenderSettings.skybox = theme.skyboxMaterial;
-            DynamicGI.UpdateEnvironment(); // Iþýklandýrmayý skybox'a göre güncelle
-        }
-
-        // 6. Iþýk Rengi (Opsiyonel: Tema bazlý ýþýk rengi deðiþimi)
+    {       
+        // Iþýk Rengi (Opsiyonel: Tema bazlý ýþýk rengi deðiþimi)
         if (directionalLight != null)
         {
             // 0 ile 2PI arasýnda bir açý (Döngü için)
@@ -293,11 +260,6 @@ public class LevelGenerator : MonoBehaviour
         if (OptimizationManager.Instance != null) OptimizationManager.Instance.RegisterStone(obj);
         return obj;
     }
-
-    [Header("Denge Ayarlarý")]
-    public float baseStoneHP = 5f;
-    public float hpGrowthFactor = 1.15f;
-    public float bossHPMultiplier = 2.0f;
 
     int CalculateHealth(bool isBigStone, int xIndex)
     {

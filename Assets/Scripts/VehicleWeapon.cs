@@ -6,11 +6,11 @@ public class VehicleWeapon : MonoBehaviour
 {
     [Header("Temel Özellikler")]
     public int level = 1;
-    public float baseDamage = 2f;
+    public float baseDamage = 3f;
     public float baseFireRate = 1.0f;
 
     [Header("Merge Dengesi")]
-    public float damageMultiplierPerMerge = 1.20f;
+    public float damageMultiplierPerMerge = 1.5f;
 
     [Header("Görseller & Referanslar")]
     public GameObject bulletPrefab; // Varsayýlan/Fallback mermi
