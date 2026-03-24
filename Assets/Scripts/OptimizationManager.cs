@@ -24,12 +24,22 @@ public class OptimizationManager : MonoBehaviour
     private List<OptimizedStone> allStones = new List<OptimizedStone>();
     private float timer;
 
+    void Start()
+    {
+        if (cameraTransform == null)
+        {
+            cameraTransform = Camera.main.transform;
+            Debug.LogWarning("OptimizationManager: Kamera Transform'u atanmadý, otomatik olarak ana kamerayý buldu.");
+        }
+    }
+
     void Awake()
     {
+       
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        //else Destroy(this);
 
-        if (cameraTransform == null) cameraTransform = Camera.main.transform;
+        cameraTransform = Camera.main.transform;
     }
 
     // --- LevelGenerator BU FONKSÝYONU ÇAÐIRACAK ---
@@ -53,7 +63,8 @@ public class OptimizationManager : MonoBehaviour
         timer += Time.deltaTime;
         if (timer < checkInterval) return;
         timer = 0f;
-
+        
+        if (cameraTransform == null) { cameraTransform = Camera.main.transform; } // Kamera hareket ediyor olabilir, her kontrol güncellemesi yapalým
         float camX = cameraTransform.position.x;
 
         // Tersten döngü kuruyoruz ki listeden silme yaparsak sorun olmasýn

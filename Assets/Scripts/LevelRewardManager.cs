@@ -18,6 +18,19 @@ public class LevelRewardManager : MonoBehaviour
 
     private int lastCalculatedReward = 0;
 
+    private void Start()
+    {
+        // Yeni level yüklendiðinde, ölümsüz CrazyGamesManager'a "Yeni yönetici benim" diyoruz.
+        if (CrazyGamesManager.Instance != null)
+        {
+            CrazyGamesManager.Instance.levelRewardManager = this;
+            Debug.Log("LevelRewardManager baþarýyla CrazyGamesManager'a baðlandý!");
+        }
+        else
+        {
+            Debug.LogWarning("CrazyGamesManager sahnede bulunamadý!");
+        }
+    }
     public void ShowReward(int level, int currentHealth, int maxHealth)
     {
         // ... (Burasý ayný kalacak) ...
@@ -69,7 +82,7 @@ public class LevelRewardManager : MonoBehaviour
 
     // ... Diðer fonksiyonlarýn (AdRevive, AdFreeGold vb.) aynen kalacak ...
     public void AdRevive() { VehicleStackManager.Instance.Revive(); }
-    public void AdFreeGold() { VehicleStackManager.Instance.AddMoney(100); RewardButtons.Instance.HideCurrent(); }
+    public void AdFreeGold() { VehicleStackManager.Instance.AddMoney(300); RewardButtons.Instance.HideCurrent(); }
     public void AdActivateSlow() { GameManager.Instance.SlowGame(15f); RewardButtons.Instance.HideCurrent(); }
     public void AdFreeHealth() { VehicleStackManager.Instance.AddHealth(); RewardButtons.Instance.HideCurrent(); }
     public void RandomFreeUpgrade() { UpgradeManager.Instance.ApplyRandomFreeUpgrade(); RewardButtons.Instance.HideCurrent(); }

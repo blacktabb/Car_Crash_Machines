@@ -22,7 +22,10 @@ public class SpecialStone : MonoBehaviour
     private bool isTriggered = false;
 
     [Header("Sandýk Ayarlarý")]
-    public int goldAmount = 10;
+    [Header("Sandýk Ayarlarý")]
+    public int baseGoldAmount = 10;           // Baþlangýç (1. Seviye) altýný
+    public int goldIncreaseAmount = 20;       // Her eþikte kaç altýn eklensin?
+    public int levelThresholdForBonus = 5;
     public GameObject goldPopupPrefab;
 
     public void ActivateSpecialEffect()
@@ -86,22 +89,38 @@ public class SpecialStone : MonoBehaviour
 
     void OpenChest()
     {
-        if (VehicleStackManager.Instance != null)
+        // 1. O anki leveli al (LevelManager yoksa güvenli kalmak için 1 kabul et)
+        int currentLevel = 1;
+        if (LevelManager.Instance != null)
         {
-            VehicleStackManager.Instance.AddMoney(goldAmount);
+            currentLevel = LevelManager.Instance.currentLevel;
         }
 
+        // 2. Altýn miktarýný hesapla
+        // Mantýk: (Level - 1) / Eþik Deðeri. 
+        // Örn: Level 1-4 -> Çarpan 0 | Level 5-9 -> Çarpan 1 | Level 10-14 -> Çarpan 2
+        int bonusSteps = (currentLevel - 1) / levelThresholdForBonus;
+        int finalGoldAmount = baseGoldAmount + (bonusSteps * goldIncreaseAmount);
+
+        // 3. Parayý oyuncuya ver
+        if (VehicleStackManager.Instance != null)
+        {
+            VehicleStackManager.Instance.AddMoney(finalGoldAmount);
+        }
+
+        // 4. Görsel Popup'ý göster
         if (goldPopupPrefab != null)
         {
             GameObject popup = Instantiate(goldPopupPrefab, transform.position + Vector3.up * 2, Quaternion.identity);
             TextMeshPro textMesh = popup.GetComponent<TextMeshPro>();
             if (textMesh != null)
             {
-                textMesh.text = "+" + goldAmount + " G";
+                textMesh.text = "+" + finalGoldAmount + " G";
                 textMesh.color = Color.yellow;
                 textMesh.fontSize = 6;
             }
         }
+
         if (explosionEffect != null)
             Instantiate(explosionEffect, transform.position, Quaternion.identity);
 

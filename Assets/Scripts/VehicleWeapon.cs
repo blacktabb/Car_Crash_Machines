@@ -10,7 +10,7 @@ public class VehicleWeapon : MonoBehaviour
     public float baseFireRate = 1.0f;
 
     [Header("Merge Dengesi")]
-    public float damageMultiplierPerMerge = 1.5f;
+    public float damageMultiplierPerMerge = 2f;
 
     [Header("Görseller & Referanslar")]
     public GameObject bulletPrefab; // Varsayýlan/Fallback mermi
@@ -26,6 +26,21 @@ public class VehicleWeapon : MonoBehaviour
     [Header("Animasyon Ayarlarý")]
     public float mergeMoveSpeed = 15f;
     private float nextFireTime = 0f;
+
+    // --- EKSÝK OLAN KISIM: GLOBAL PERK SÝSTEMÝ EKLENDÝ ---
+    // Statik olduklarý için sahnede kaç tane silah olursa olsun hepsi bu deðerleri okur.
+    public static float globalPerkDamageMultiplier = 1.0f;
+    public static float globalPerkFireRateMultiplier = 1.0f;
+    public static float globalPerkCritChanceAdd = 0f;
+
+    // Yeni levele geçildiðinde veya oyun yeniden baþladýðýnda perkleri sýfýrlamak için
+    public static void ResetGlobalPerks()
+    {
+        globalPerkDamageMultiplier = 1.0f;
+        globalPerkFireRateMultiplier = 1.0f;
+        globalPerkCritChanceAdd = 0f;
+    }
+    // -------------------------------------------------------
 
     [HideInInspector] public float tempDamageMultiplier = 1.0f;
     [HideInInspector] public float tempFireRateDivider = 1.0f;
@@ -83,7 +98,11 @@ public class VehicleWeapon : MonoBehaviour
 
         float levelBonus = (level - 1) * 0.1f;
         float totalFireRate = baseFireRate + bonusSpeed + levelBonus;
+
         totalFireRate /= tempFireRateDivider;
+        // YENÝ: Global Atýþ Hýzý Perki Uygulamasý
+        totalFireRate *= globalPerkFireRateMultiplier;
+
         float fireDelay = 1.0f / totalFireRate;
 
         if (Time.time >= nextFireTime)
@@ -124,18 +143,29 @@ public class VehicleWeapon : MonoBehaviour
 
         if (bulletScript != null)
         {
-            float bonusDamage = 0f;
+            // --- YÜZDELÝK HASAR SÝSTEMÝ ---
+            float bonusDamagePercent = 0f;
             if (UpgradeManager.Instance != null)
             {
                 int atkLvl = PlayerPrefs.GetInt("Upg_AtkPower", 0);
-                bonusDamage = atkLvl * UpgradeManager.Instance.incValue_Atk;
+                // Örn: Level 5 x 10 = %50 Ekstra Hasar Yüzdesi
+                bonusDamagePercent = atkLvl * UpgradeManager.Instance.incValue_Atk;
             }
 
+            // 1. Önce Silahýn kendi birleþimlerden (merge) gelen hasarýný hesaplýyoruz
             float tierIndex = Mathf.Log(level, 2);
             float mergeMultiplier = Mathf.Pow(damageMultiplierPerMerge, tierIndex);
-            float finalDamage = (baseDamage * mergeMultiplier) + bonusDamage;
+            float baseCalculatedDamage = (baseDamage * mergeMultiplier);
 
-            finalDamage *= tempDamageMultiplier;
+            // 2. Þimdi Yüzdelik Artýþý bu temel hasarýn üzerine ekliyoruz
+            float finalDamage = baseCalculatedDamage + (baseCalculatedDamage * (bonusDamagePercent / 100f));
+
+            finalDamage *= tempDamageMultiplier; // Perklerden gelen geçici çarpan (eski sistem yedek)
+
+            // YENÝ: Global Hasar Perki Uygulamasý
+            finalDamage *= globalPerkDamageMultiplier;
+
+            Debug.Log($"[HASAR BÝLGÝSÝ] Base Hasar: {baseDamage} | Toplam Bonus: %{bonusDamagePercent} | Vurulan Son Hasar: {finalDamage}");
 
             float critChance = 5.0f;
             float critMult = 1.5f;
@@ -149,7 +179,10 @@ public class VehicleWeapon : MonoBehaviour
                 critMult += (critDmgLvl * UpgradeManager.Instance.incValue_CritDmg);
             }
 
-            critChance += tempCritChanceAdd;
+            critChance += tempCritChanceAdd; // Eski sistem yedek
+
+            // YENÝ: Global Kritik Perki Uygulamasý
+            critChance += globalPerkCritChanceAdd;
 
             bool isCritical = (Random.Range(0f, 100f) < critChance);
             if (isCritical) finalDamage *= critMult;

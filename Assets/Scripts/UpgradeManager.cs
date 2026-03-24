@@ -32,15 +32,16 @@ public class UpgradeManager : MonoBehaviour
     public int baseCost_Gold = 30; public int costInc_Gold = 15;
 
     [Header("Upgrade Deðerleri")]
-    public float incValue_Atk = 1f;
+    public float incValue_Atk = 20f;
     public float incValue_Spd = 0.2f;
     public float incValue_CritRate = 1f;
     public float incValue_CritDmg = 0.2f;
-    public int incValue_Gold = 2;
+    public int incValue_Gold = 4;
 
     // --- LÝMÝTLER ---
     private int absoluteMaxLimit_Stack = 8; // Silah slotu limiti
     private int maxLevel_CritRate = 30;     // Crit Rate limiti (YENÝ)
+    public int maxLevel_AtkSpeed = 5;
 
     private string[] randomUpgradeCandidates = new string[]
     {
@@ -66,7 +67,7 @@ public class UpgradeManager : MonoBehaviour
 
         // 2. ATTACK SPEED (Sýnýr yok)
         CalculateAndSetSlot(slot_AtkSpeed, "Upg_AtkSpeed", baseCost_Spd, costInc_Spd, currentGold,
-            $"Increases attack speed \n+{incValue_Spd}");
+            $"Increases attack speed \n+{incValue_Spd}", maxLevel_AtkSpeed);
 
         // 3. CRIT RATE (Max Level 30 Sýnýrý Var!)
         // Buraya 'maxLevel_CritRate' deðiþkenini gönderiyoruz.
@@ -174,6 +175,9 @@ public class UpgradeManager : MonoBehaviour
             if (key == "Upg_CritRate" && currentLvl >= maxLevel_CritRate)
                 continue;
 
+            if (key == "Upg_AtkSpeed" && currentLvl >= maxLevel_AtkSpeed)
+                continue;
+
             // Diðerlerinde þu an sýnýr yok, listeye ekle
             validKeys.Add(key);
         }
@@ -215,7 +219,7 @@ public class UpgradeManager : MonoBehaviour
     public void BuyUpgrade_MaxHealth() { BuyUpgrade("Upg_MaxHealth", baseCost_HP, costInc_HP); if (VehicleStackManager.Instance != null) VehicleStackManager.Instance.OnHealthUpgradeBought(); }
     public void BuyUpgrade_GoldGain() { BuyUpgrade("Upg_GoldGain", baseCost_Gold, costInc_Gold); }
     public void BuyUpgrade_AttackPower() { BuyUpgrade("Upg_AtkPower", baseCost_Atk, costInc_Atk); }
-    public void BuyUpgrade_AttackSpeed() { BuyUpgrade("Upg_AtkSpeed", baseCost_Spd, costInc_Spd); }
+    public void BuyUpgrade_AttackSpeed() { BuyUpgrade("Upg_AtkSpeed", baseCost_Spd, costInc_Spd, maxLevel_AtkSpeed); }
     public void BuyUpgrade_CritDmg() { BuyUpgrade("Upg_CritDmg", baseCost_CritDmg, costInc_CritDmg); }
 
     public void BuyUpgrade_MaxStack()

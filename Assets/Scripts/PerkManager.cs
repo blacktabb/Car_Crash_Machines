@@ -17,12 +17,11 @@ public class PerkManager : MonoBehaviour
         public float value; // Bu yeni perk için buraya ne yazdýðýnýn önemi yok (0 kalabilir)
     }
 
-    // 1. DEÐÝÞÝKLÝK: Yeni tipi buraya ekledik (UpgradeLowest)
     public enum PerkType { DamageBoost, FireRateBoost, CritChanceBoost, GoldBoost, UpgradeLowest, RandomFreeUpgrade }
 
     [Header("Ayarlar")]
     public GameObject perkPanel;
-    public PerkCardUI[] cardSlots;
+    public PerkCardUI[] cardSlots; // Script isminin projendeki adla (PerkCardUI) ayný olduðuna emin ol.
     public List<PerkData> availablePerks;
 
     [Header("Durum")]
@@ -66,49 +65,44 @@ public class PerkManager : MonoBehaviour
         VehicleStackManager stackManager = Object.FindFirstObjectByType<VehicleStackManager>();
         UpgradeManager upgradeManager = Object.FindFirstObjectByType<UpgradeManager>();
 
-        if (stackManager != null)
+        // --- 1. GLOBAL STAT PERKLERÝ (Tüm silahlarý anýnda etkiler) ---
+        if (perk.type == PerkType.DamageBoost)
         {
-            // A) EÐER ALTIN BOOST ÝSE:
+            VehicleWeapon.globalPerkDamageMultiplier += perk.value;
+            Debug.Log($" [PERK UYGULANDI] Hasar Artýrýldý! Eklenen: +{perk.value} | Yeni Hasar Çarpaný: {VehicleWeapon.globalPerkDamageMultiplier}x");
+        }
+        else if (perk.type == PerkType.FireRateBoost)
+        {
+            VehicleWeapon.globalPerkFireRateMultiplier += perk.value;
+            Debug.Log($" [PERK UYGULANDI] Atýþ Hýzý Artýrýldý! Eklenen: +{perk.value} | Yeni Hýz Çarpaný: {VehicleWeapon.globalPerkFireRateMultiplier}x");
+        }
+        else if (perk.type == PerkType.CritChanceBoost)
+        {
+            VehicleWeapon.globalPerkCritChanceAdd += perk.value;
+            Debug.Log($" [PERK UYGULANDI] Kritik Þansý Artýrýldý! Eklenen: +%{perk.value} | Toplam Ekstra Þans: %{VehicleWeapon.globalPerkCritChanceAdd}");
+        }
+        // --- 2. ALTIN VE SÝLAH LEVELÝ PERKLERÝ ---
+        else if (stackManager != null)
+        {
             if (perk.type == PerkType.GoldBoost)
             {
                 stackManager.tempGoldMultiplier += perk.value;
             }
-            // 2. DEÐÝÞÝKLÝK: EÐER "EN DÜÞÜÐÜ YÜKSELT" ÝSE:
             else if (perk.type == PerkType.UpgradeLowest)
             {
-                // VehicleStackManager'daki fonksiyonu tetikliyoruz
                 stackManager.UpgradeLowestLevelWeapon();
-            }
-            // C) EÐER STAT (HASAR/HIZ) BOOST ÝSE:
-            else 
-            {
-                foreach (VehicleWeapon weapon in stackManager.carStack)
-                {
-                    ApplyToWeapon(weapon, perk);
-                }
             }
         }
 
-        // Paneli Kapat ve Devam Et
+        // --- 3. BEDAVA UPGRADE PERKÝ (Yeni Baðlantý) ---
+        if (perk.type == PerkType.RandomFreeUpgrade && upgradeManager != null)
+        {
+            upgradeManager.ApplyRandomFreeUpgrade();
+        }
+
+        // Paneli Kapat ve Oyunu Devam Ettir
         perkPanel.SetActive(false);
         Time.timeScale = 1f;
         isPerkActive = false;
-    }
-
-    public void ApplyToWeapon(VehicleWeapon weapon, PerkData perk)
-    {
-        switch (perk.type)
-        {
-            case PerkType.DamageBoost:
-                weapon.tempDamageMultiplier += perk.value;
-                break;
-            case PerkType.FireRateBoost:
-                weapon.tempFireRateDivider += perk.value;
-                break;
-            case PerkType.CritChanceBoost:
-                weapon.tempCritChanceAdd += perk.value;
-                break;
-                // UpgradeLowest buraya girmeyecek çünkü yukarýda else if ile ayýrdýk.
-        }
     }
 }

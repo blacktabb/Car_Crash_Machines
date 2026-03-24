@@ -188,7 +188,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9178028527408576552, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
   m_PrefabInstance: {fileID: 785687981}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 980687136}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -333,6 +333,127 @@ MonoBehaviour:
   titleText: {fileID: 484907380}
   descText: {fileID: 1803082564}
   selectButton: {fileID: 86769429}
+--- !u!1 &93444510
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 93444512}
+  - component: {fileID: 93444511}
+  m_Layer: 0
+  m_Name: UpgradeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &93444511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93444510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c30383f79acb6488fba750795a7197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slot_AtkPower: {fileID: 460655957}
+  slot_AtkSpeed: {fileID: 1269249045}
+  slot_CritRate: {fileID: 1840438481}
+  slot_CritDmg: {fileID: 580506005}
+  slot_MaxHealth: {fileID: 1921788018}
+  slot_MaxStack: {fileID: 2133627916}
+  slot_GoldGain: {fileID: 1188897223}
+  baseCost_Atk: 120
+  costInc_Atk: 100
+  baseCost_Spd: 150
+  costInc_Spd: 120
+  baseCost_CritRate: 100
+  costInc_CritRate: 100
+  baseCost_CritDmg: 200
+  costInc_CritDmg: 150
+  baseCost_HP: 1200
+  costInc_HP: 1000
+  baseCost_Stack: 1300
+  costInc_Stack: 1200
+  baseCost_Gold: 100
+  costInc_Gold: 90
+  incValue_Atk: 20
+  incValue_Spd: 0.2
+  incValue_CritRate: 1
+  incValue_CritDmg: 0.2
+  incValue_Gold: 4
+  maxLevel_AtkSpeed: 15
+--- !u!4 &93444512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93444510}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &103092742
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 103092744}
+  - component: {fileID: 103092743}
+  m_Layer: 0
+  m_Name: CoinAnimationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &103092743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103092742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15115c546be9e8b4f9a44ef3dd11e317, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinPrefab: {fileID: 3814100146896917924, guid: c111bd9fb32708c45b03f7c2c122fa4f, type: 3}
+  targetLogo: {fileID: 632632718}
+  mainCanvas: {fileID: 707863919}
+  maxCoinAmount: 5
+  spread: 1
+  speed: 2
+--- !u!4 &103092744
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103092742}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &123584295
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -412,7 +533,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_CritRate
@@ -768,7 +889,7 @@ PrefabInstance:
     - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133681}
+      objectReference: {fileID: 1326271893}
     - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: RewardedAdShow
@@ -784,7 +905,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6868667133185156384, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 135118145}
   m_SourcePrefab: {fileID: 100100000, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
 --- !u!224 &135118139 stripped
 RectTransform:
@@ -796,6 +920,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6868667133185156384, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
   m_PrefabInstance: {fileID: 135118138}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &135118145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135118140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: Gold
 --- !u!1 &135614295
 GameObject:
   m_ObjectHideFlags: 0
@@ -1211,13 +1348,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 236133675}
-  - component: {fileID: 236133674}
   - component: {fileID: 236133677}
-  - component: {fileID: 236133678}
-  - component: {fileID: 236133679}
-  - component: {fileID: 236133680}
-  - component: {fileID: 236133681}
-  - component: {fileID: 236133682}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1225,123 +1356,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &236133674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b10c6d6b2ec61045a880bac4712d452, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  themes:
-  - themeName: Rock and Grass
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: af3f6c2cb7411274d9b54d86e4b09e6d, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: a0aad691ce3d7e145a9aeb0a09067fe0, type: 3}
-    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
-    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
-  - themeName: Sand
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: 2ce64937402d6454fbc82338cd110f84, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: bf77d6ae052cbf841a47de72cf03307e, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 5518ccd610cf0294aa308c23a1ff2a9a, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: 1cf6f4c6e6e0518419839d3f5448dd99, type: 2}
-  - themeName: Mine
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: 6550f617f0baee240aa8e89d6cd29633, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
-    - {fileID: 3870604115094039680, guid: b05d21059e3b13542bbd7bb9abc9bcd4, type: 3}
-    - {fileID: 919132149155446097, guid: 87f562bad24274846ae04e3c32d908be, type: 3}
-    - {fileID: 919132149155446097, guid: db0bcdbc90197fb4ea49c820019b3fb9, type: 3}
-    - {fileID: 919132149155446097, guid: 5872a8e040dbd744f838d434c95f6ec2, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
-    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
-    - {fileID: 919132149155446097, guid: 0982b5466c1d5b84ea19d7e3bca322d7, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: cc421da483ed06c49933077a621bff25, type: 2}
-  - themeName: Mine and Snow
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: 44983ea753386a342a1544d78e1dae42, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
-    - {fileID: 3870604115094039680, guid: b05d21059e3b13542bbd7bb9abc9bcd4, type: 3}
-    - {fileID: 919132149155446097, guid: 87f562bad24274846ae04e3c32d908be, type: 3}
-    - {fileID: 919132149155446097, guid: db0bcdbc90197fb4ea49c820019b3fb9, type: 3}
-    - {fileID: 919132149155446097, guid: 5872a8e040dbd744f838d434c95f6ec2, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
-    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
-    - {fileID: 919132149155446097, guid: 0982b5466c1d5b84ea19d7e3bca322d7, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
-  - themeName: Sand and Snow
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: 9a5e4e010cd198749a85d82de38de4e3, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: bf77d6ae052cbf841a47de72cf03307e, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 5518ccd610cf0294aa308c23a1ff2a9a, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: 1cf6f4c6e6e0518419839d3f5448dd99, type: 2}
-  - themeName: Rock, Grass and Snow
-    topStonePrefabs:
-    - {fileID: 919132149155446097, guid: 7899bdc4dac45ef4f8016aa1747f4706, type: 3}
-    - {fileID: 919132149155446097, guid: 44983ea753386a342a1544d78e1dae42, type: 3}
-    smallStones:
-    - {fileID: 919132149155446097, guid: a0aad691ce3d7e145a9aeb0a09067fe0, type: 3}
-    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
-    bigStones:
-    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
-    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
-    rareStones:
-    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
-    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
-    skyboxMaterial: {fileID: 2100000, guid: cc421da483ed06c49933077a621bff25, type: 2}
-  directionalLight: {fileID: 1048295542}
-  topLayerCount: 1
-  startMaxHeight: 4
-  absoluteMaxHeight: 8
-  increaseEveryXLevel: 3
-  heightVariation: 1
-  baseLevelLength: 50
-  lengthIncreasePerLevel: 0
-  maxLevelLength: 250
-  currentCalculatedLength: 0
-  cellSize: 1
-  startXOffset: 20
-  scrollSpeed: 2
-  bigStoneChance: 0.2
-  rareStoneChance: 0.15
-  baseStoneHP: 1
-  hpGrowthFactor: 1.2
-  bossHPMultiplier: 2
-  bigStoneHealthMult: 2
-  finishLinePrefab: {fileID: 7366939196652648581, guid: ffe6f33e3c1767a4083e63ac273feeb9, type: 3}
-  finishLineOffset: 5
 --- !u!4 &236133675
 Transform:
   m_ObjectHideFlags: 0
@@ -1373,109 +1387,8 @@ MonoBehaviour:
   flashingText: {fileID: 1500490665}
   blinkSpeed: 3
   targetSpeed: 4
+  maxTargetSpeed: 8
   gameSpeed: 1
---- !u!114 &236133678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d28fcfbf569924141b0c3c1c435003d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 519420032}
-  activationDistance: 30
-  destroyDistance: 15
-  checkInterval: 0.2
---- !u!114 &236133679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c30383f79acb6488fba750795a7197, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slot_AtkPower: {fileID: 460655957}
-  slot_AtkSpeed: {fileID: 1269249045}
-  slot_CritRate: {fileID: 1840438481}
-  slot_CritDmg: {fileID: 580506005}
-  slot_MaxHealth: {fileID: 1921788018}
-  slot_MaxStack: {fileID: 2133627916}
-  slot_GoldGain: {fileID: 1188897223}
-  baseCost_Atk: 40
-  costInc_Atk: 40
-  baseCost_Spd: 10
-  costInc_Spd: 5
-  baseCost_CritRate: 10
-  costInc_CritRate: 5
-  baseCost_CritDmg: 15
-  costInc_CritDmg: 15
-  baseCost_HP: 150
-  costInc_HP: 150
-  baseCost_Stack: 200
-  costInc_Stack: 250
-  baseCost_Gold: 15
-  costInc_Gold: 10
-  incValue_Atk: 1
-  incValue_Spd: 0.2
-  incValue_CritRate: 1
-  incValue_CritDmg: 0.2
-  incValue_Gold: 2
---- !u!114 &236133680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266d7b92b3c9e2848a671257e98fa0cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pausePanel: {fileID: 1902432514}
-  confirmResetProgressPanel: {fileID: 1206959831}
-  soundButtonImage: {fileID: 1038471911}
-  soundOnSprite: {fileID: 21300000, guid: 901d64fc6ad9d44799c2ad0fd4f182d2, type: 3}
-  soundOffSprite: {fileID: 21300000, guid: 78757b0623f3b4309b7cc69c4769ae37, type: 3}
---- !u!114 &236133681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2f0f00ab5d55154ebf9a8f67716e591, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelRewardManager: {fileID: 687391247}
---- !u!114 &236133682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 236133673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15115c546be9e8b4f9a44ef3dd11e317, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coinPrefab: {fileID: 3814100146896917924, guid: c111bd9fb32708c45b03f7c2c122fa4f, type: 3}
-  targetLogo: {fileID: 632632718}
-  mainCanvas: {fileID: 707863919}
-  maxCoinAmount: 5
-  spread: 1
-  speed: 2
 --- !u!1 &240451023
 GameObject:
   m_ObjectHideFlags: 0
@@ -1626,6 +1539,155 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 244454617}
   m_CullTransparentMesh: 1
+--- !u!1 &248436480
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 248436482}
+  - component: {fileID: 248436481}
+  m_Layer: 0
+  m_Name: LevelGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &248436481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248436480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b10c6d6b2ec61045a880bac4712d452, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  themes:
+  - themeName: Rock and Grass
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: af3f6c2cb7411274d9b54d86e4b09e6d, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: a0aad691ce3d7e145a9aeb0a09067fe0, type: 3}
+    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
+    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
+  - themeName: Sand
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: 2ce64937402d6454fbc82338cd110f84, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: bf77d6ae052cbf841a47de72cf03307e, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 5518ccd610cf0294aa308c23a1ff2a9a, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: 1cf6f4c6e6e0518419839d3f5448dd99, type: 2}
+  - themeName: Mine
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: 6550f617f0baee240aa8e89d6cd29633, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
+    - {fileID: 3870604115094039680, guid: b05d21059e3b13542bbd7bb9abc9bcd4, type: 3}
+    - {fileID: 919132149155446097, guid: 87f562bad24274846ae04e3c32d908be, type: 3}
+    - {fileID: 919132149155446097, guid: db0bcdbc90197fb4ea49c820019b3fb9, type: 3}
+    - {fileID: 919132149155446097, guid: 5872a8e040dbd744f838d434c95f6ec2, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
+    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
+    - {fileID: 919132149155446097, guid: 0982b5466c1d5b84ea19d7e3bca322d7, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: cc421da483ed06c49933077a621bff25, type: 2}
+  - themeName: Mine and Snow
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: 44983ea753386a342a1544d78e1dae42, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
+    - {fileID: 3870604115094039680, guid: b05d21059e3b13542bbd7bb9abc9bcd4, type: 3}
+    - {fileID: 919132149155446097, guid: 87f562bad24274846ae04e3c32d908be, type: 3}
+    - {fileID: 919132149155446097, guid: db0bcdbc90197fb4ea49c820019b3fb9, type: 3}
+    - {fileID: 919132149155446097, guid: 5872a8e040dbd744f838d434c95f6ec2, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
+    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
+    - {fileID: 919132149155446097, guid: 0982b5466c1d5b84ea19d7e3bca322d7, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
+  - themeName: Sand and Snow
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: 9a5e4e010cd198749a85d82de38de4e3, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: bf77d6ae052cbf841a47de72cf03307e, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 5518ccd610cf0294aa308c23a1ff2a9a, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: 1cf6f4c6e6e0518419839d3f5448dd99, type: 2}
+  - themeName: Rock, Grass and Snow
+    topStonePrefabs:
+    - {fileID: 919132149155446097, guid: 7899bdc4dac45ef4f8016aa1747f4706, type: 3}
+    - {fileID: 919132149155446097, guid: 44983ea753386a342a1544d78e1dae42, type: 3}
+    smallStones:
+    - {fileID: 919132149155446097, guid: a0aad691ce3d7e145a9aeb0a09067fe0, type: 3}
+    - {fileID: 919132149155446097, guid: d98c9647ba7ce684c8577c8012b5970c, type: 3}
+    bigStones:
+    - {fileID: 919132149155446097, guid: 57eab9b76b0f0234e978273ba26f53a9, type: 3}
+    - {fileID: 919132149155446097, guid: cb7ff9f7d489412418852f6eca13ea14, type: 3}
+    rareStones:
+    - {fileID: 919132149155446097, guid: acd01822f70c8a24789e274967c53284, type: 3}
+    - {fileID: 919132149155446097, guid: fa186174f8c185c4ca69b3977dc19196, type: 3}
+    skyboxMaterial: {fileID: 2100000, guid: cc421da483ed06c49933077a621bff25, type: 2}
+  directionalLight: {fileID: 1048295542}
+  topLayerCount: 1
+  startMaxHeight: 4
+  absoluteMaxHeight: 8
+  increaseEveryXLevel: 3
+  heightVariation: 1
+  baseLevelLength: 50
+  lengthIncreasePerLevel: 2
+  maxLevelLength: 250
+  currentCalculatedLength: 0
+  cellSize: 1
+  startXOffset: 20
+  scrollSpeed: 2
+  bigStoneChance: 0.2
+  rareStoneChance: 0.15
+  baseStoneHP: 1.7
+  hpGrowthFactor: 1.2
+  bossHPMultiplier: 2
+  bigStoneHealthMult: 2
+  finishLinePrefab: {fileID: 7366939196652648581, guid: ffe6f33e3c1767a4083e63ac273feeb9, type: 3}
+  finishLineOffset: 5
+--- !u!4 &248436482
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248436480}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &273369034
 GameObject:
   m_ObjectHideFlags: 0
@@ -2177,6 +2239,7 @@ MonoBehaviour:
   reviveClearRadius: 10
   damageClearRadius: 6
   clearHeight: 500
+  perk: {fileID: 322900044}
 --- !u!4 &420024811
 Transform:
   m_ObjectHideFlags: 0
@@ -2793,6 +2856,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 504955692}
   m_CullTransparentMesh: 0
+--- !u!1 &507680155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1010428681933019105, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
+  m_PrefabInstance: {fileID: 1005959511}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &507680160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507680155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: Revive
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -8590,7 +8671,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 25}
-  m_SizeDelta: {x: 500, y: 850}
+  m_SizeDelta: {x: 500, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &678608718
 MonoBehaviour:
@@ -8624,7 +8705,6 @@ GameObject:
   m_Component:
   - component: {fileID: 687391246}
   - component: {fileID: 687391245}
-  - component: {fileID: 687391247}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -8651,7 +8731,7 @@ MonoBehaviour:
   baseGameSpeed: 1
   speedMultiplier: 0.05
   maxGameSpeed: 1
-  rewardManager: {fileID: 687391247}
+  rewardManager: {fileID: 1409174053}
   playerCurrentHealth: 0
   playerMaxHealth: 0
   currentLevelIndex: 0
@@ -8661,7 +8741,8 @@ MonoBehaviour:
   levelTitleText: {fileID: 1026588455}
   progressText: {fileID: 1944014199}
   levelNumberText: {fileID: 902880055}
-  spawner: {fileID: 236133674}
+  nextLevelButton: {fileID: 0}
+  spawner: {fileID: 0}
 --- !u!4 &687391246
 Transform:
   m_ObjectHideFlags: 0
@@ -8677,24 +8758,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &687391247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 687391244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf4e2b09105723f4c86f3dbba147398d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  goldText: {fileID: 2070913413}
-  doubleRewardButton: {fileID: 64361539}
-  adIconsGroup: {fileID: 1492385841}
-  baseGold: 50
-  increaseAmount: 50
-  penaltyPerHealth: 10
 --- !u!1001 &704048627
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8766,7 +8829,7 @@ PrefabInstance:
     - target: {fileID: 7441164633208928925, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 7441164633208928925, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -8798,7 +8861,7 @@ PrefabInstance:
     - target: {fileID: 7441164633239524860, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 7441164633239524860, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -8914,14 +8977,14 @@ PrefabInstance:
     - target: {fileID: 7441164634349314122, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 7441164634349314122, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7441164634349314122, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ResumeGame
+      value: TogglePause
       objectReference: {fileID: 0}
     - target: {fileID: 7441164634349314122, guid: f9cd6fffc6ad846969fe938fe26f9eac, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -9461,7 +9524,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_CritDmg
@@ -9749,6 +9812,129 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveDirection: {x: -0.32, y: 0, z: 0}
+--- !u!1 &725913105
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 725913108}
+  - component: {fileID: 725913107}
+  - component: {fileID: 725913106}
+  m_Layer: 5
+  m_Name: UpArrow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &725913106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725913105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: e8d14adc6f6f447abaa5f808b7302376, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &725913107
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725913105}
+  m_CullTransparentMesh: 1
+--- !u!224 &725913108
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725913105}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1049907346}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -143}
+  m_SizeDelta: {x: 80, y: 80}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &730488328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 730488330}
+  - component: {fileID: 730488329}
+  m_Layer: 0
+  m_Name: OptimizationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &730488329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730488328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28fcfbf569924141b0c3c1c435003d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraTransform: {fileID: 519420032}
+  activationDistance: 30
+  destroyDistance: 15
+  checkInterval: 0.2
+--- !u!4 &730488330
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730488328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &774100643
 GameObject:
   m_ObjectHideFlags: 0
@@ -10099,6 +10285,26 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5890122543204141778, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5890122543204141778, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5890122543204141778, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 311.22455
+      objectReference: {fileID: 0}
+    - target: {fileID: 5890122543204141778, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -100.048706
+      objectReference: {fileID: 0}
+    - target: {fileID: 5890122543204141779, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6451906353535157978, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -10116,13 +10322,28 @@ PrefabInstance:
       value: -100
       objectReference: {fileID: 0}
     - target: {fileID: 9178028527408576552, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178028527408576552, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133681}
+      objectReference: {fileID: 1409174053}
+    - target: {fileID: 9178028527408576552, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ActivateDoubleReward
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178028527408576552, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LevelRewardManager, Assembly-CSharp
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4009443956077135514, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 980687140}
   m_SourcePrefab: {fileID: 100100000, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
 --- !u!1 &788258087
 GameObject:
@@ -10547,7 +10768,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_AttackSpeed
@@ -10756,6 +10977,7 @@ GameObject:
   - component: {fileID: 972337174}
   - component: {fileID: 972337176}
   - component: {fileID: 972337175}
+  - component: {fileID: 972337177}
   m_Layer: 5
   m_Name: BottomPanel
   m_TagString: Untagged
@@ -10821,6 +11043,39 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 972337173}
   m_CullTransparentMesh: 1
+--- !u!114 &972337177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972337173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e847dbc0ce7ea949afaac5959a9a67a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upArrow: {fileID: 725913105}
+  downArrow: {fileID: 1623335756}
+  threshold: 0.05
+--- !u!1 &980687136 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4009443956077135514, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
+  m_PrefabInstance: {fileID: 785687981}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &980687140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980687136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: DoubleGold
 --- !u!1001 &983963930
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10900,7 +11155,11 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
+    - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BuyUpgrade_AttackPower
+      objectReference: {fileID: 0}
     - target: {fileID: 4963058650419650947, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -11238,7 +11497,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_MaxHealth
@@ -11592,7 +11851,7 @@ PrefabInstance:
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133681}
+      objectReference: {fileID: 1326271893}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -11745,7 +12004,10 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 1010428680573637213, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1010428681933019105, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 507680160}
   m_SourcePrefab: {fileID: 100100000, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
 --- !u!114 &1026588455 stripped
 MonoBehaviour:
@@ -11920,6 +12182,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 725913108}
+  - {fileID: 1623335759}
   - {fileID: 189278697}
   - {fileID: 972337174}
   m_Father: {fileID: 707863919}
@@ -16934,25 +17198,25 @@ MonoBehaviour:
     type: 2
     value: 1
   - title: Attack Speed
-    description: Increase attack speed by +0.1
+    description: Increase attack speed by +0.3
     icon: {fileID: 0}
     type: 1
-    value: 0.05
+    value: 0.3
   - title: Lowest Weapon Upgrade
     description: It upgrades the lowest-level weapon to the next level.
     icon: {fileID: 0}
     type: 4
     value: 0
   - title: Attack Damage
-    description: Increase attack damage by +0.3
+    description: Increase attack damage by %30
     icon: {fileID: 0}
     type: 0
-    value: 0
+    value: 0.3
   - title: Gold Gain
-    description: +0.5 Gold per stone.
+    description: +4 Gold per stone.
     icon: {fileID: 0}
     type: 3
-    value: 0
+    value: 4
   isPerkActive: 1
 --- !u!4 &1091210380
 Transform:
@@ -17205,6 +17469,7 @@ GameObject:
   - component: {fileID: 1126692876}
   - component: {fileID: 1126692875}
   - component: {fileID: 1126692874}
+  - component: {fileID: 1126692878}
   m_Layer: 5
   m_Name: Perk4FreeRandomUpgrade
   m_TagString: Untagged
@@ -17294,7 +17559,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 236133681}
+      - m_Target: {fileID: 1326271893}
         m_TargetAssemblyTypeName: CrazyGamesManager, Assembly-CSharp
         m_MethodName: RewardedAdShow
         m_Mode: 5
@@ -17344,6 +17609,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126692872}
   m_CullTransparentMesh: 1
+--- !u!114 &1126692878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126692872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: RandomFreeUpgrade
 --- !u!1001 &1177420927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17576,7 +17854,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_GoldGain
@@ -18027,6 +18305,51 @@ MonoBehaviour:
   titleText: {fileID: 2138442532}
   descText: {fileID: 141118788}
   selectButton: {fileID: 1305141112}
+--- !u!1 &1326271892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1326271894}
+  - component: {fileID: 1326271893}
+  m_Layer: 0
+  m_Name: CrazyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1326271893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326271892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2f0f00ab5d55154ebf9a8f67716e591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelRewardManager: {fileID: 1409174053}
+--- !u!4 &1326271894
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326271892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1335369190 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2499070864755745693, guid: a9b74f959810c42fd96fbe080bd3d50c, type: 3}
@@ -18038,6 +18361,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1409174052
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1409174054}
+  - component: {fileID: 1409174053}
+  m_Layer: 0
+  m_Name: LevelRewardManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1409174053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409174052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf4e2b09105723f4c86f3dbba147398d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goldText: {fileID: 2070913413}
+  doubleRewardButton: {fileID: 64361539}
+  adIconsGroup: {fileID: 1492385841}
+  baseGold: 50
+  increaseAmount: 50
+  penaltyPerHealth: 10
+--- !u!4 &1409174054
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409174052}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1415989807 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3100686136978186089, guid: 5bd5e0d874b6b4e43b50591d3f985047, type: 3}
@@ -18748,7 +19121,7 @@ PrefabInstance:
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133681}
+      objectReference: {fileID: 1326271893}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -18780,6 +19153,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1611641706}
+    - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1611641710}
   m_SourcePrefab: {fileID: 100100000, guid: a166131307c2def41856b3997e765035, type: 3}
 --- !u!224 &1598460432 stripped
 RectTransform:
@@ -18803,6 +19179,94 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1611641710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611641702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: Health
+--- !u!1 &1623335756
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1623335759}
+  - component: {fileID: 1623335758}
+  - component: {fileID: 1623335757}
+  m_Layer: 5
+  m_Name: DownArrow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1623335757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623335756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: b1f7b89245b4b44f4ada3ef1983c72f9, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1623335758
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623335756}
+  m_CullTransparentMesh: 1
+--- !u!224 &1623335759
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623335756}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1049907346}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 63}
+  m_SizeDelta: {x: 80, y: 80}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1625630356
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18882,7 +19346,7 @@ PrefabInstance:
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133679}
+      objectReference: {fileID: 93444511}
     - target: {fileID: 3525341134230467368, guid: 0f812a483af294eabbe3936b737f4d3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: BuyUpgrade_MaxStack
@@ -19682,6 +20146,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1804988177}
   m_CullTransparentMesh: 0
+--- !u!1 &1809025307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1809025309}
+  - component: {fileID: 1809025308}
+  m_Layer: 0
+  m_Name: PauseManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1809025308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809025307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 266d7b92b3c9e2848a671257e98fa0cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pausePanel: {fileID: 1902432514}
+  confirmResetProgressPanel: {fileID: 1206959831}
+  soundButtonImage: {fileID: 1038471911}
+  soundOnSprite: {fileID: 21300000, guid: 901d64fc6ad9d44799c2ad0fd4f182d2, type: 3}
+  soundOffSprite: {fileID: 21300000, guid: 78757b0623f3b4309b7cc69c4769ae37, type: 3}
+--- !u!4 &1809025309
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809025307}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1819167012 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5046479677215344380, guid: 507661935984042ab88b945d296e8029, type: 3}
@@ -20557,7 +21070,7 @@ PrefabInstance:
     - target: {fileID: 6023546394165222167, guid: 9ade2d27289d049409e3f7a6c834a1ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 6023546394165222167, guid: 9ade2d27289d049409e3f7a6c834a1ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -20773,7 +21286,7 @@ PrefabInstance:
     - target: {fileID: 7116568004887008266, guid: 9ade2d27289d049409e3f7a6c834a1ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 7116568004887008266, guid: 9ade2d27289d049409e3f7a6c834a1ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -26695,7 +27208,7 @@ PrefabInstance:
     - target: {fileID: 5046479677215344381, guid: 507661935984042ab88b945d296e8029, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133680}
+      objectReference: {fileID: 1809025308}
     - target: {fileID: 5046479677215344381, guid: 507661935984042ab88b945d296e8029, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -27054,7 +27567,7 @@ PrefabInstance:
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 236133681}
+      objectReference: {fileID: 1326271893}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -27086,6 +27599,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1630908501602266386}
+    - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1630908501602266390}
   m_SourcePrefab: {fileID: 100100000, guid: a166131307c2def41856b3997e765035, type: 3}
 --- !u!224 &1630908501602266382 stripped
 RectTransform:
@@ -27104,6 +27620,19 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1630908501602266390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816477910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardID: SlowGame
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -27127,3 +27656,10 @@ SceneRoots:
   - {fileID: 1186024380}
   - {fileID: 1177420927}
   - {fileID: 774100647}
+  - {fileID: 248436482}
+  - {fileID: 730488330}
+  - {fileID: 93444512}
+  - {fileID: 1809025309}
+  - {fileID: 1326271894}
+  - {fileID: 103092744}
+  - {fileID: 1409174054}

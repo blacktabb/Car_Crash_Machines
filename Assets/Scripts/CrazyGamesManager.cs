@@ -4,20 +4,26 @@ using System;
 
 public class CrazyGamesManager : MonoBehaviour
 {
-    // Butona baðlayacaðýn fonksiyon (Ödüllü Reklam)
+    public static CrazyGamesManager Instance; // Bu satýrda uyarýyý veriyor.
+
+    // Inspector'dan atama yapmana artýk gerek yok ama kalmasýnda da sakýnca yok.
     [SerializeField] public LevelRewardManager levelRewardManager;
     private string chosenReward;
-    public static CrazyGamesManager Instance;
-    // Oyun açýlýr açýlmaz (Start'tan bile önce) burasý çalýþýr
+
     private void Awake()
     {
-        Debug.Log("CrazyGames SDK baþlatýlýyor...");
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        // SDK'yý manuel olarak baþlatýyoruz
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         CrazySDK.Init(() =>
         {
-            // SDK baþarýyla kuruldu, artýk reklam istenebilir
-            Debug.Log("CrazyGames SDK Baþarýyla Baþlatýldý (Init Tamam)!");
+            Debug.Log("CrazyGames SDK Ready");
         });
     }
 
@@ -76,7 +82,8 @@ public class CrazyGamesManager : MonoBehaviour
     }
 
     void TakeReward()
-    {       
+    {     
+
         switch (chosenReward)
         {
             case "Revive":
@@ -105,8 +112,8 @@ public class CrazyGamesManager : MonoBehaviour
 
             default:
                 Debug.LogWarning("Bilinmeyen ödül türü: " + chosenReward);
-                break;                      
-        }        
+                break;
+        }
         Debug.Log("Tebrikler! Ödül hesabýna eklendi.");
     }
 }

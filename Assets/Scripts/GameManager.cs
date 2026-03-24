@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Oyun Hýzý")]
     public float targetSpeed = 5f;
+    public float maxTargetSpeed = 12f; // --- YENÝ: Maksimum Hýz Sýnýrý ---
 
     [HideInInspector]
     public float gameSpeed = 0f;
@@ -27,10 +28,25 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        string currentVersion = Application.version;
+        string savedVersion = PlayerPrefs.GetString("GameVersion", "");
+
+        if (savedVersion != currentVersion)
+        {
+            Debug.Log("Yeni build tespit edildi. PlayerPrefs temizleniyor.");
+
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.SetString("GameVersion", currentVersion);
+            PlayerPrefs.Save();
+        }
     }
 
     void Start()
     {
+        // Baþlangýçta hedef hýzýn sýnýrý aþmadýðýndan emin ol
+        targetSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
+
         if (isFirstLaunch)
         {
             gameSpeed = 0f;
@@ -51,6 +67,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // --- YENÝ: HIZ SABÝTLEME (CLAMP) ---
+        // Eðer targetSpeed bir þekilde sýnýrý geçerse, onu sýnýr deðerine geri çekiyoruz.
+        if (targetSpeed > maxTargetSpeed)
+        {
+            targetSpeed = maxTargetSpeed;
+        }
+
+        // Eðer oyun akýyorsa ve bir yavaþlatma efekti aktif deðilse, 
+        // oyun hýzýný hedef hýza eþitliyoruz. (Böylece dýþarýdan artýþlar anýnda yansýr)
+        if (!waitingForInput && slowRoutine == null)
+        {
+            gameSpeed = targetSpeed;
+        }
+        // -----------------------------------
+
         if (waitingForInput)
         {
             HandleTapToPlay();
@@ -59,22 +90,12 @@ public class GameManager : MonoBehaviour
 
     void HandleTapToPlay()
     {
-        // --- DEÐÝÞÝKLÝK BURADA: PULSE (BÜYÜME-KÜÇÜLME) EFEKTÝ ---
         if (flashingText != null)
         {
-            // Mantýk: 
-            // Mathf.Sin -> -1 ile 1 arasýnda gidip gelen bir dalga üretir.
-            // * 0.1f -> Bu dalgayý küçültürüz (-0.1 ile 0.1 arasý).
-            // + 1f   -> Üzerine 1 ekleriz (0.9 ile 1.1 arasý olur).
-            // Sonuç: Metin orijinal boyutunun %90'ý ile %110'u arasýnda gidip gelir.
-
             float scaleValue = 1f + (Mathf.Sin(Time.time * blinkSpeed) * 0.1f);
-
-            // UI elemanýnýn boyutunu (Scale) güncelle
             flashingText.transform.localScale = Vector3.one * scaleValue;
         }
 
-        // 2. Input: Týklama Algýlama
         if (Input.GetMouseButtonDown(0))
         {
             StartGameLogic();
@@ -85,7 +106,9 @@ public class GameManager : MonoBehaviour
     {
         waitingForInput = false;
         isFirstLaunch = false;
-        gameSpeed = targetSpeed;
+
+        // Baþlarken de sýnýrý koruyalým
+        gameSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
 
         if (tapToPlayPanel != null)
             tapToPlayPanel.SetActive(false);
@@ -101,6 +124,7 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator SlowRoutine(float duration)
+
     {
         float originalSpeed = targetSpeed;
 
@@ -108,7 +132,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         if (!waitingForInput)
-            gameSpeed = originalSpeed;
+            gameSpeed = targetSpeed; // originalSpeed yerine direkt güncel targetSpeed'e dön
 
         slowRoutine = null;
     }

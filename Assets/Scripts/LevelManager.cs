@@ -43,6 +43,9 @@ public class LevelManager : MonoBehaviour
     [Header("PerkManager")]
     private float nextPerkThreshold = 0.5f;
 
+    public Button nextLevelButton;
+    private bool isProcessing = false;
+
     public MonoBehaviour spawner;
 
     void Awake()
@@ -56,6 +59,9 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+        VehicleWeapon.ResetGlobalPerks();
+        RestoreSoundState();
+
         // UI Baþlangýç Ayarlarý
         if (progressBar != null) progressBar.value = 0;
 
@@ -179,6 +185,10 @@ public class LevelManager : MonoBehaviour
 
     void LevelComplete()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXState(false);
+        }
         // Ses efekti oynat
         if (AudioManager.Instance != null) AudioManager.Instance.PlayWin();
         // ...
@@ -197,6 +207,11 @@ public class LevelManager : MonoBehaviour
         // ses efekti oynat
         if (AudioManager.Instance != null) AudioManager.Instance.PlayLose();
         // ...
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXState(false);
+        }
 
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
@@ -232,6 +247,13 @@ public class LevelManager : MonoBehaviour
 
     public void NextLevel()
     {
+        if (isProcessing) return;
+
+        isProcessing = true;
+
+        if (nextLevelButton != null)
+            nextLevelButton.interactable = false;
+
         int adCounter = PlayerPrefs.GetInt("AdCounter", 0);
         adCounter++;
 
@@ -272,6 +294,8 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.Save();
             LoadNextSceneLogic();
         }
+
+        
     }
 
     void LoadNextSceneLogic()
@@ -317,5 +341,15 @@ public class LevelManager : MonoBehaviour
 
         // Normal bitiþ rutinini çaðýr
         StartCoroutine(FinishLevelRoutine());
+    }
+
+    public void RestoreSoundState()
+    {
+        if (AudioManager.Instance != null)
+        {
+            // PlayerPrefs içinden PauseManager'ýn kaydettiði deðeri okuruz (1 ise açýk, 0 ise kapalý)
+            bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+            AudioManager.Instance.SetSFXState(isSoundOn);
+        }
     }
 }

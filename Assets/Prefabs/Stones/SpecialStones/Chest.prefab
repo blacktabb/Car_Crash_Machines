@@ -127,7 +127,7 @@ MonoBehaviour:
   goldValue: 10
   damagePopupPrefab: {fileID: 3995854055235832005, guid: b889bccfe0f1e48488d453ee4da957fb, type: 3}
   goldPopupPrefab: {fileID: 3995854055235832005, guid: 2d319dea684400547a7fac59ddebadbb, type: 3}
-  deathEffect: {fileID: 6631328132968268246, guid: fe1d595400d82df49a4cc04de599ad86, type: 3}
+  deathEffect: {fileID: 1247311384876784, guid: 4adffb0018aeda44e9263f901167af1f, type: 3}
   stoneRenderer: {fileID: -7511558181221131132}
   hitColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   recoverySpeed: 20
@@ -148,8 +148,12 @@ MonoBehaviour:
   stoneType: 1
   explosionRadius: 1
   explosionDamage: 0
-  explosionEffect: {fileID: 100002, guid: 8ac7c51da8481d04281de20a4d9a2015, type: 3}
-  goldAmount: 10
+  explosionEffect: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 0.5
+  baseGoldAmount: 20
+  goldIncreaseAmount: 20
+  levelThresholdForBonus: 5
   goldPopupPrefab: {fileID: 3995854055235832005, guid: b889bccfe0f1e48488d453ee4da957fb, type: 3}
 --- !u!65 &1120249152035299980
 BoxCollider:

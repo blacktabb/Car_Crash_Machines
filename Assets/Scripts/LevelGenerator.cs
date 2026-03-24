@@ -83,10 +83,22 @@ public class LevelGenerator : MonoBehaviour
         GenerateGridAndSpawn();
     }
 
+    // --- YENÝ EKLENEN GÜVENLÝ LEVEL OKUMA FONKSÝYONU ---
+    // Awake esnasýnda LevelManager uyanmamýþ olsa bile leveli doðru okumamýzý saðlar.
+    private int GetCurrentLevel()
+    {
+        if (LevelManager.Instance != null)
+            return LevelManager.Instance.currentLevel;
+
+        // LevelManager yoksa kayýt dosyasýndan al
+        return PlayerPrefs.GetInt("CurrentLevel", 1);
+    }
+    // ----------------------------------------------------
+
     // --- UZUNLUK HESABI ---
     void CalculateLevelLength()
     {
-        int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
+        int currentLevel = GetCurrentLevel(); // Düzeltildi
 
         int calculated = baseLevelLength + ((currentLevel - 1) * lengthIncreasePerLevel);
         currentCalculatedLength = Mathf.Min(calculated, maxLevelLength);
@@ -95,26 +107,17 @@ public class LevelGenerator : MonoBehaviour
     }
     // ----------------------
 
-    // --- YENÝ EKLENEN FONKSÝYON: ÇEVREYÝ GÜNCELLE ---
+    // --- ÇEVREYÝ GÜNCELLE ---
     void UpdateEnvironmentVisuals(LevelTheme theme)
-    {       
+    {
         // Iþýk Rengi (Opsiyonel: Tema bazlý ýþýk rengi deðiþimi)
         if (directionalLight != null)
         {
-            // 0 ile 2PI arasýnda bir açý (Döngü için)
-            // currentLevel 1 iken 0 olsun istiyoruz.
-            float cycle = ((LevelManager.Instance.currentLevel - 1) % 20) / 20f * Mathf.PI * 2;
-
-            // Sinüs -1 ile 1 arasý deðer verir. Bunu 0.3 (Gece) ile 1.2 (Öðlen) arasýna haritalayalým.
-            // (Sinüs + 1) / 2 -> 0 ile 1 arasý deðer verir.
+            int currentLevel = GetCurrentLevel(); // Düzeltildi
+            float cycle = ((currentLevel - 1) % 20) / 20f * Mathf.PI * 2;
             float intensity = 0.3f + (((Mathf.Cos(cycle) + 1f) / 2f) * 0.9f);
 
-            // Cosinus kullandýk çünkü level 1'de (cycle 0) en yüksek (gündüz) baþlasýn.
-
             directionalLight.intensity = intensity;
-
-            // Ýstersen renk tonunu da deðiþtirebilirsin (Opsiyonel)
-            // directionalLight.color = Color.Lerp(Color.blue, Color.white, intensity);
         }
     }
     // -----------------------------------------------
@@ -135,7 +138,7 @@ public class LevelGenerator : MonoBehaviour
     void GenerateGridAndSpawn()
     {
         int totalStonesSpawned = 0;
-        int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
+        int currentLevel = GetCurrentLevel(); // Düzeltildi
         int currentMaxHeight = CurrentLevelMaxHeight;
 
         int currentMinHeight = Mathf.Max(1, currentMaxHeight - heightVariation);
@@ -219,7 +222,7 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    // --- YARDIMCI FONKSÝYONLAR (AYNI) ---
+    // --- YARDIMCI FONKSÝYONLAR ---
     void SpawnStoneFromList(GameObject[] sourceList, int xIndex, int yIndex, bool isBig)
     {
         if (sourceList == null || sourceList.Length == 0) return;
@@ -263,7 +266,7 @@ public class LevelGenerator : MonoBehaviour
 
     int CalculateHealth(bool isBigStone, int xIndex)
     {
-        int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
+        int currentLevel = GetCurrentLevel(); // Düzeltildi
 
         float levelBaseHP = baseStoneHP * Mathf.Pow(hpGrowthFactor, currentLevel - 1);
 
@@ -272,7 +275,6 @@ public class LevelGenerator : MonoBehaviour
             levelBaseHP *= bossHPMultiplier;
         }
 
-        // xIndex / currentCalculatedLength kullanarak oranla
         float progressPercent = (float)xIndex / (float)currentCalculatedLength;
         float distanceMultiplier = 1.0f + (progressPercent * 0.5f);
 
@@ -288,7 +290,8 @@ public class LevelGenerator : MonoBehaviour
 
     public void CalculateCurrentLevelMaxHeight()
     {
-        int currentLevel = (LevelManager.Instance != null) ? LevelManager.Instance.currentLevel : 1;
+        int currentLevel = GetCurrentLevel(); // Düzeltildi
+
         int calculatedMax = startMaxHeight + ((currentLevel - 1) / increaseEveryXLevel);
         CurrentLevelMaxHeight = Mathf.Clamp(calculatedMax, startMaxHeight, absoluteMaxHeight);
     }

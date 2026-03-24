@@ -65,6 +65,7 @@ public class VehicleStackManager : MonoBehaviour
     public float reviveClearRadius = 10f; // Yatay genişlik (Kapsülün kalınlığı)
     public float damageClearRadius = 3f;
     public float clearHeight = 20f;
+    public GameObject perk;
 
 
 
@@ -83,15 +84,6 @@ public class VehicleStackManager : MonoBehaviour
         UpdateHealthUI();
         SpawnWeapon();
         UpdateUI();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            AddMoney(1000); // Mevcut AddMoney fonksiyonunu çağırıyoruz
-            Debug.Log("CHEAT: 1000 Altın eklendi!");
-        }
     }
 
     void SaveGameData()
@@ -433,7 +425,22 @@ public class VehicleStackManager : MonoBehaviour
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (LevelManager.Instance != null)
             LevelManager.Instance.ResumeAfterRevive();
-        Time.timeScale = 1f;
+        if (perk != null && perk.activeInHierarchy)
+        {
+            // Hediye açık → oyun durmaya devam etsin
+            Time.timeScale = 0f;
+
+            Debug.Log("Hediye açık, oyun duruyor");
+        }
+        else
+        {
+            // Hediye kapalı → oyun devam etsin
+            Time.timeScale = 1f;
+
+            Debug.Log("Hediye kapalı, oyun devam ediyor");
+        }
+
+        LevelManager.Instance.RestoreSoundState();
     }
     public void AddHealth()
     {
