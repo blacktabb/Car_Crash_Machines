@@ -81,9 +81,9 @@ public class LevelRewardManager : MonoBehaviour
     }
 
     // ... Diðer fonksiyonlarýn (AdRevive, AdFreeGold vb.) aynen kalacak ...
-    public void AdRevive() { VehicleStackManager.Instance.Revive(); }
+    public void AdRevive() { VehicleStackManager.Instance.Revive(); VehicleStackManager.Instance.gameOverPanel.SetActive(false); }
     public void AdFreeGold() { VehicleStackManager.Instance.AddMoney(300); RewardButtons.Instance.HideCurrent(); }
     public void AdActivateSlow() { GameManager.Instance.SlowGame(15f); RewardButtons.Instance.HideCurrent(); }
     public void AdFreeHealth() { VehicleStackManager.Instance.AddHealth(); RewardButtons.Instance.HideCurrent(); }
-    public void RandomFreeUpgrade() { UpgradeManager.Instance.ApplyRandomFreeUpgrade(); RewardButtons.Instance.HideCurrent(); }
+    public void RandomFreeUpgrade() { UpgradeManager.Instance.ApplyRandomFreeUpgrade(); RewardButtons.Instance.HideCurrent(); PerkManager.Instance.perkPanel.SetActive(false); }
 }

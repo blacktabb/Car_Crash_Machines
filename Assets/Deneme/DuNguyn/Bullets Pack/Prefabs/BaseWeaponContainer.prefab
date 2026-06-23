@@ -256,9 +256,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 1
-  baseDamage: 2
-  baseFireRate: 1.2
-  damageMultiplierPerMerge: 1.5
+  baseDamage: 1
+  baseFireRate: 1.5
+  damageMultiplierPerMerge: 1.2
   bulletPrefab: {fileID: 1515156445706929689, guid: 1cf0755864afe52489ee90aeba52e1d5, type: 3}
   bulletPrefabs:
   - {fileID: 2173695533259509649, guid: c7af1ad525a695644b3ebdec5e518645, type: 3}

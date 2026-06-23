@@ -29,6 +29,7 @@ public class CrazyGamesManager : MonoBehaviour
 
     // --- BUTON FONKSÝYONLARI ---
 
+
     // Ödüllü Reklam (Rewarded)
     public void RewardedAdShow(string rewardID)
     {
@@ -50,8 +51,10 @@ public class CrazyGamesManager : MonoBehaviour
             () => {
                 // Reklam Bitti (Ödül Zamaný)
                 Debug.Log("Reklam bitti.");
-                Time.timeScale = 1f;
+                Time.timeScale = 1f;            
                 TakeReward();
+                VehicleStackManager.Instance.gameOverPanel.SetActive(false);
+                PerkManager.Instance.perkPanel.SetActive(false);
             }
         );
     }
@@ -88,6 +91,7 @@ public class CrazyGamesManager : MonoBehaviour
         {
             case "Revive":
                 levelRewardManager.AdRevive();
+                VehicleStackManager.Instance.gameOverPanel.SetActive(false);
                 break;
 
             case "Gold":
@@ -108,6 +112,7 @@ public class CrazyGamesManager : MonoBehaviour
 
             case "RandomFreeUpgrade":
                 levelRewardManager.RandomFreeUpgrade();
+                PerkManager.Instance.perkPanel.SetActive(false);
                 break;
 
             default:

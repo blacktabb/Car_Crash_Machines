@@ -36,12 +36,14 @@ public class UpgradeManager : MonoBehaviour
     public float incValue_Spd = 0.2f;
     public float incValue_CritRate = 1f;
     public float incValue_CritDmg = 0.2f;
-    public int incValue_Gold = 4;
+    public int incValue_Gold = 1;
 
     // --- LÝMÝTLER ---
     private int absoluteMaxLimit_Stack = 8; // Silah slotu limiti
     private int maxLevel_CritRate = 30;     // Crit Rate limiti (YENÝ)
     public int maxLevel_AtkSpeed = 5;
+    public int maxLevel_GoldGain = 9;
+    public int maxLevel_Health = 3; // Max Health için de bir limit ekleyebiliriz, þimdilik sýnýrsýz býraktýk.
 
     private string[] randomUpgradeCandidates = new string[]
     {
@@ -80,14 +82,14 @@ public class UpgradeManager : MonoBehaviour
 
         // 5. MAX HEALTH (Sýnýr yok)
         CalculateAndSetSlot(slot_MaxHealth, "Upg_MaxHealth", baseCost_HP, costInc_HP, currentGold,
-            "Increases max health \n+1 HP");
+            "Increases max health \n+1 HP", maxLevel_Health);
 
         // 6. MAX STACK (Özel fonksiyonu var)
         UpdateMaxStackSlot(currentGold);
 
         // 7. GOLD GAIN (Sýnýr yok)
         CalculateAndSetSlot(slot_GoldGain, "Upg_GoldGain", baseCost_Gold, costInc_Gold, currentGold,
-            $"Increases won gold per stone \n+{incValue_Gold}");
+            $"Increases won gold per stone \n+{incValue_Gold}", maxLevel_GoldGain);
     }
 
     // --- GÜNCELLENEN FONKSÝYON: MaxLevel Parametresi Eklendi ---
@@ -205,7 +207,7 @@ public class UpgradeManager : MonoBehaviour
             PerkManager.Instance.isPerkActive = false; // Perk ekranýný kapat
             PerkManager.Instance.perkPanel.SetActive(false);
         }
-
+        Time.timeScale = 1f; // Oyun yavaþlamýþ olabilir, normal hýzýna getir
         Debug.Log($"REKLAM ÖDÜLÜ: {selectedKey} ücretsiz yükseltildi!");
     }
     // ----------------------------------------

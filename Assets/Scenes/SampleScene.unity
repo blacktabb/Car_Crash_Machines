@@ -370,9 +370,9 @@ MonoBehaviour:
   slot_MaxStack: {fileID: 2133627916}
   slot_GoldGain: {fileID: 1188897223}
   baseCost_Atk: 120
-  costInc_Atk: 100
-  baseCost_Spd: 150
-  costInc_Spd: 120
+  costInc_Atk: 200
+  baseCost_Spd: 250
+  costInc_Spd: 300
   baseCost_CritRate: 100
   costInc_CritRate: 100
   baseCost_CritDmg: 200
@@ -381,14 +381,16 @@ MonoBehaviour:
   costInc_HP: 1000
   baseCost_Stack: 1300
   costInc_Stack: 1200
-  baseCost_Gold: 100
-  costInc_Gold: 90
-  incValue_Atk: 20
+  baseCost_Gold: 190
+  costInc_Gold: 210
+  incValue_Atk: 17
   incValue_Spd: 0.2
   incValue_CritRate: 1
   incValue_CritDmg: 0.2
-  incValue_Gold: 4
-  maxLevel_AtkSpeed: 15
+  incValue_Gold: 1
+  maxLevel_AtkSpeed: 4
+  maxLevel_GoldGain: 6
+  maxLevel_Health: 3
 --- !u!4 &93444512
 Transform:
   m_ObjectHideFlags: 0
@@ -887,12 +889,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1326271893}
+      objectReference: {fileID: 1409174053}
     - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RewardedAdShow
+      value: AdFreeGold
+      objectReference: {fileID: 0}
+    - target: {fileID: 5966143358155031729, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LevelRewardManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6868667133185156384, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
       propertyPath: m_Name
@@ -905,10 +915,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6868667133185156384, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 135118145}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
 --- !u!224 &135118139 stripped
 RectTransform:
@@ -920,19 +927,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6868667133185156384, guid: 4c673da187026dc4ead5a2bde217e802, type: 3}
   m_PrefabInstance: {fileID: 135118138}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &135118145
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135118140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardID: Gold
 --- !u!1 &135614295
 GameObject:
   m_ObjectHideFlags: 0
@@ -1666,9 +1660,9 @@ MonoBehaviour:
   startXOffset: 20
   scrollSpeed: 2
   bigStoneChance: 0.2
-  rareStoneChance: 0.15
+  rareStoneChance: 0.1
   baseStoneHP: 1.7
-  hpGrowthFactor: 1.2
+  hpGrowthFactor: 1.1
   bossHPMultiplier: 2
   bigStoneHealthMult: 2
   finishLinePrefab: {fileID: 7366939196652648581, guid: ffe6f33e3c1767a4083e63ac273feeb9, type: 3}
@@ -2237,7 +2231,7 @@ MonoBehaviour:
   upgradeFX: {fileID: 100000, guid: aa3fed151f536ee49b583c6a3ac4a2e1, type: 3}
   tempGoldMultiplier: 1
   reviveClearRadius: 10
-  damageClearRadius: 6
+  damageClearRadius: 7
   clearHeight: 500
   perk: {fileID: 322900044}
 --- !u!4 &420024811
@@ -2856,24 +2850,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 504955692}
   m_CullTransparentMesh: 0
---- !u!1 &507680155 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1010428681933019105, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
-  m_PrefabInstance: {fileID: 1005959511}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &507680160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507680155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardID: Revive
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -11846,23 +11822,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1326271893}
+      objectReference: {fileID: 420024810}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RewardedAdShow
+      value: Revive
       objectReference: {fileID: 0}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CrazyGamesManager, Assembly-CSharp
+      value: VehicleStackManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 1010428681933019109, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
@@ -12004,10 +11980,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 1010428680573637213, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1010428681933019105, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 507680160}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8eaba58d9e454056a88c211c0ccf93b, type: 3}
 --- !u!114 &1026588455 stripped
 MonoBehaviour:
@@ -17213,10 +17186,10 @@ MonoBehaviour:
     type: 0
     value: 0.3
   - title: Gold Gain
-    description: +4 Gold per stone.
+    description: +2 Gold per stone.
     icon: {fileID: 0}
     type: 3
-    value: 4
+    value: 2
   isPerkActive: 1
 --- !u!4 &1091210380
 Transform:
@@ -17469,7 +17442,6 @@ GameObject:
   - component: {fileID: 1126692876}
   - component: {fileID: 1126692875}
   - component: {fileID: 1126692874}
-  - component: {fileID: 1126692878}
   m_Layer: 5
   m_Name: Perk4FreeRandomUpgrade
   m_TagString: Untagged
@@ -17559,10 +17531,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1326271893}
-        m_TargetAssemblyTypeName: CrazyGamesManager, Assembly-CSharp
-        m_MethodName: RewardedAdShow
-        m_Mode: 5
+      - m_Target: {fileID: 93444511}
+        m_TargetAssemblyTypeName: UpgradeManager, Assembly-CSharp
+        m_MethodName: ApplyRandomFreeUpgrade
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -17609,19 +17581,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126692872}
   m_CullTransparentMesh: 1
---- !u!114 &1126692878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126692872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardID: RandomFreeUpgrade
 --- !u!1001 &1177420927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19116,23 +19075,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1326271893}
+      objectReference: {fileID: 1409174053}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RewardedAdShow
+      value: AdFreeHealth
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CrazyGamesManager, Assembly-CSharp
+      value: LevelRewardManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
@@ -19153,9 +19112,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1611641706}
-    - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1611641710}
   m_SourcePrefab: {fileID: 100100000, guid: a166131307c2def41856b3997e765035, type: 3}
 --- !u!224 &1598460432 stripped
 RectTransform:
@@ -19179,19 +19135,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1611641710
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1611641702}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardID: Health
 --- !u!1 &1623335756
 GameObject:
   m_ObjectHideFlags: 0
@@ -27562,23 +27505,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1326271893}
+      objectReference: {fileID: 1409174053}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RewardedAdShow
+      value: AdActivateSlow
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CrazyGamesManager, Assembly-CSharp
+      value: LevelRewardManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7470663695130030621, guid: a166131307c2def41856b3997e765035, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
@@ -27599,9 +27542,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1630908501602266386}
-    - targetCorrespondingSourceObject: {fileID: 3680234415627369792, guid: a166131307c2def41856b3997e765035, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1630908501602266390}
   m_SourcePrefab: {fileID: 100100000, guid: a166131307c2def41856b3997e765035, type: 3}
 --- !u!224 &1630908501602266382 stripped
 RectTransform:
@@ -27620,19 +27560,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1630908501602266390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 816477910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffea717bf3502e4cae2df831023e577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardID: SlowGame
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

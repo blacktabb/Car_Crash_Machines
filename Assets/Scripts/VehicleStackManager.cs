@@ -422,7 +422,7 @@ public class VehicleStackManager : MonoBehaviour
         UpdateHealthUI();
         UpdateUI();
         DestroyNearbyStones(reviveClearRadius); // Doğunca etrafı temizle (10m)
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        
         if (LevelManager.Instance != null)
             LevelManager.Instance.ResumeAfterRevive();
         if (perk != null && perk.activeInHierarchy)
@@ -439,7 +439,7 @@ public class VehicleStackManager : MonoBehaviour
 
             Debug.Log("Hediye kapalı, oyun devam ediyor");
         }
-
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
         LevelManager.Instance.RestoreSoundState();
     }
     public void AddHealth()
