@@ -1,6 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using TMPro;
+using Playgama;
+using Playgama.Modules.Platform;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,14 +11,14 @@ public class GameManager : MonoBehaviour
     // --- STATIC KONTROL ---
     public static bool isFirstLaunch = true;
 
-    [Header("Başlangıç UI Ayarları")]
+    [Header("BaÅŸlangÄ±Ã§ UI AyarlarÄ±")]
     public GameObject tapToPlayPanel;
     public TextMeshProUGUI flashingText;
-    public float blinkSpeed = 5f; // Animasyon hızı (Daha hızlı nefes alsın diye artırabilirsin)
+    public float blinkSpeed = 5f; // Animasyon hÄ±zÄ± (Daha hÄ±zlÄ± nefes alsÄ±n diye artÄ±rabilirsin)
 
-    [Header("Oyun Hızı")]
+    [Header("Oyun HÄ±zÄ±")]
     public float targetSpeed = 5f;
-    public float maxTargetSpeed = 12f; // --- YENİ: Maksimum Hız Sınırı ---
+    public float maxTargetSpeed = 12f; // --- YENÄ°: Maksimum HÄ±z SÄ±nÄ±rÄ± ---
 
     [HideInInspector]
     public float gameSpeed = 0f;
@@ -44,7 +46,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Başlangıçta hedef hızın sınırı aşmadığından emin ol
+        Bridge.platform.SendMessage(PlatformMessage.GameReady);
+        // BaÅŸlangÄ±Ã§ta hedef hÄ±zÄ±n sÄ±nÄ±rÄ± aÅŸmadÄ±ÄŸÄ±ndan emin ol
         targetSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
 
         if (isFirstLaunch)
@@ -67,15 +70,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // --- YENİ: HIZ SABİTLEME (CLAMP) ---
-        // Eğer targetSpeed bir şekilde sınırı geçerse, onu sınır değerine geri çekiyoruz.
+        // --- YENÄ°: HIZ SABÄ°TLEME (CLAMP) ---
+        // EÄŸer targetSpeed bir ÅŸekilde sÄ±nÄ±rÄ± geÃ§erse, onu sÄ±nÄ±r deÄŸerine geri Ã§ekiyoruz.
         if (targetSpeed > maxTargetSpeed)
         {
             targetSpeed = maxTargetSpeed;
         }
 
-        // Eğer oyun akıyorsa ve bir yavaşlatma efekti aktif değilse, 
-        // oyun hızını hedef hıza eşitliyoruz. (Böylece dışarıdan artışlar anında yansır)
+        // EÄŸer oyun akÄ±yorsa ve bir yavaÅŸlatma efekti aktif deÄŸilse, 
+        // oyun hÄ±zÄ±nÄ± hedef hÄ±za eÅŸitliyoruz. (BÃ¶ylece dÄ±ÅŸarÄ±dan artÄ±ÅŸlar anÄ±nda yansÄ±r)
         if (!waitingForInput && slowRoutine == null)
         {
             gameSpeed = targetSpeed;
@@ -104,17 +107,18 @@ public class GameManager : MonoBehaviour
 
     public void StartGameLogic()
     {
+        Bridge.platform.SendMessage(PlatformMessage.GameplayStarted);
         waitingForInput = false;
         isFirstLaunch = false;
 
-        // Başlarken de sınırı koruyalım
+        // BaÅŸlarken de sÄ±nÄ±rÄ± koruyalÄ±m
         gameSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
 
         if (tapToPlayPanel != null)
             tapToPlayPanel.SetActive(false);
     }
 
-    // --- HIZ YAVAŞLATMA SİSTEMİ ---
+    // --- HIZ YAVAÅLATMA SÄ°STEMÄ° ---
     public void SlowGame(float duration)
     {
         if (slowRoutine != null)
@@ -132,7 +136,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         if (!waitingForInput)
-            gameSpeed = targetSpeed; // originalSpeed yerine direkt güncel targetSpeed'e dön
+            gameSpeed = targetSpeed; // originalSpeed yerine direkt gÃ¼ncel targetSpeed'e dÃ¶n
 
         slowRoutine = null;
     }

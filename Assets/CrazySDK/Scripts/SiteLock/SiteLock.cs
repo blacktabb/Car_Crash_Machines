@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -49,70 +49,10 @@ namespace CrazyGames
 
         public static bool DidRun { get; private set; }
 
-        public static void Check()
+                public static void Check()
         {
             DidRun = true;
-
-            if (Application.platform != RuntimePlatform.WebGLPlayer)
-            {
-                return;
-            }
-
-            if (IsOnWhitelistedDomain())
-            {
-                // if the game is running on dev's domain, don't proceed further with the sitelock
-                return;
-            }
-
-            DebugLog("[CrazySDK] SiteLock v" + sitelockVersion);
-
-            var url = Application.absoluteURL;
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                Crash(1);
-            }
-
-            // check if the allowed domains have been tampered
-            var domains = new List<string>();
-            domains.AddRange(allowedLocalHosts);
-            domains.AddRange(allowedRemoteHosts);
-            var signatures = new List<string>();
-            signatures.AddRange(allowedLocalHostsSignatures);
-            signatures.AddRange(allowedRemoteHostsSignatures);
-            for (var index = 0; index < domains.Count; index++)
-            {
-                if (!Encryption.Verify(domains[index], signatures[index], publicKey))
-                {
-                    Crash(2);
-                }
-            }
-
-            var host = uri.Host;
-
-            var splittedHost = host.Split("."[0]);
-            var crazyIndex = -1;
-
-            for (var i = 0; i < splittedHost.Length; i++)
-            {
-                var split = splittedHost[i].ToLower();
-                if (split != "crazygames" && split != "dev-crazygames")
-                    continue;
-                crazyIndex = i;
-                break;
-            }
-
-            if (
-                crazyIndex >= 0 && splittedHost.Length == crazyIndex + 2
-                || splittedHost.Length == crazyIndex + 3 && splittedHost[crazyIndex + 1].Length <= 3
-            )
-            {
-                return; //no more logic needed
-            }
-
-            if (!IsOnValidHost())
-            {
-                Crash(3);
-            }
+            return; // --- SITELOCK DISABLED ---
         }
 
         private static bool IsOnValidHost()
@@ -239,3 +179,4 @@ namespace CrazyGames
         }
     }
 }
+

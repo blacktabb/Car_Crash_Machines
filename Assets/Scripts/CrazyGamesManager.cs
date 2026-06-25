@@ -1,14 +1,15 @@
-using UnityEngine;
-using CrazyGames; // Kütüphane ekli olmalý
+ï»¿using UnityEngine;
 using System;
+using Playgama;
+using Playgama.Modules.Advertisement;
 
 public class CrazyGamesManager : MonoBehaviour
 {
-    public static CrazyGamesManager Instance; // Bu satýrda uyarýyý veriyor.
+    public static CrazyGamesManager Instance;
 
-    // Inspector'dan atama yapmana artýk gerek yok ama kalmasýnda da sakýnca yok.
     [SerializeField] public LevelRewardManager levelRewardManager;
     private string chosenReward;
+    private Action currentInterstitialCallback;
 
     private void Awake()
     {
@@ -20,105 +21,127 @@ public class CrazyGamesManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        CrazySDK.Init(() =>
-        {
-            Debug.Log("CrazyGames SDK Ready");
-        });
     }
 
-    // --- BUTON FONKSÝYONLARI ---
+    private void Start()
+    {
+        Bridge.advertisement.interstitialStateChanged += OnInterstitialStateChanged;
+        Bridge.advertisement.rewardedStateChanged += OnRewardedStateChanged;
+    }
 
+    private void OnDestroy()
+    {
+        Bridge.advertisement.interstitialStateChanged -= OnInterstitialStateChanged;
+        Bridge.advertisement.rewardedStateChanged -= OnRewardedStateChanged;
+    }
 
-    // Ödüllü Reklam (Rewarded)
-    public void RewardedAdShow(string rewardID)
+    private void OnInterstitialStateChanged(InterstitialState state)
+    {
+        Debug.Log($"[Playgama] Interstitial State: {state}");
+        if (state == InterstitialState.Opened)
+        {
+            Time.timeScale = 0f;
+            if (AudioManager.Instance != null) AudioManager.Instance.SetSFXState(false);
+        }
+        else if (state == InterstitialState.Closed || state == InterstitialState.Failed)
+        {
+            Time.timeScale = 1f;
+            if (AudioManager.Instance != null) {
+                bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                AudioManager.Instance.SetSFXState(isSoundOn);
+            }
+            if (currentInterstitialCallback != null)
+            {
+                currentInterstitialCallback();
+                currentInterstitialCallback = null;
+            }
+        }
+    }
+
+    private void OnRewardedStateChanged(RewardedState state)
+    {
+        Debug.Log($"[Playgama] Rewarded State: {state}");
+        if (state == RewardedState.Opened)
+        {
+            Time.timeScale = 0f;
+            if (AudioManager.Instance != null) AudioManager.Instance.SetSFXState(false);
+        }
+        else if (state == RewardedState.Closed || state == RewardedState.Failed)
+        {
+            Time.timeScale = 1f;
+            if (AudioManager.Instance != null) {
+                bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                AudioManager.Instance.SetSFXState(isSoundOn);
+            }
+        }
+        else if (state == RewardedState.Rewarded)
+        {
+            TakeReward();
+            if (VehicleStackManager.Instance != null && VehicleStackManager.Instance.gameOverPanel != null)
+                VehicleStackManager.Instance.gameOverPanel.SetActive(false);
+                
+            if (PerkManager.Instance != null && PerkManager.Instance.perkPanel != null)
+                PerkManager.Instance.perkPanel.SetActive(false);
+        }
+    }
+
+        public void RewardedAdShow(string rewardID)
     {
         chosenReward = rewardID;
 
-        Debug.Log("Ödüllü reklam butonuna basýldý.");
-
-        CrazySDK.Ad.RequestAd(CrazyAdType.Rewarded,
-            () => {
-                // Reklam Baþladý
-                Debug.Log("Reklam baþladý. Oyun duruyor.");
-                Time.timeScale = 0f;
-            },
-            (error) => {
-                // Hata
-                Debug.LogError("Reklam hatasý: " + error);
-                Time.timeScale = 1f;
-            },
-            () => {
-                // Reklam Bitti (Ödül Zamaný)
-                Debug.Log("Reklam bitti.");
-                Time.timeScale = 1f;            
-                TakeReward();
-                VehicleStackManager.Instance.gameOverPanel.SetActive(false);
-                PerkManager.Instance.perkPanel.SetActive(false);
-            }
-        );
+        // SDK'ya doÄŸrudan Ã§aÄŸrÄ± yapÄ±yoruz, desteklenmeyen ortamlarda (Unity Editor vs.) 
+        // Playgama kendi Mock UI'sini (Test ekranÄ±nÄ±) gÃ¶sterebilir.
+        Bridge.advertisement.ShowRewarded();
     }
 
-    // Geçiþ Reklamý (Interstitial)
-    public void ShowMidgameAd(Action onComplete = null)
+        public void ShowMidgameAd(Action onComplete = null)
     {
-        Debug.Log("Geçiþ reklamý isteniyor...");
-
-        CrazySDK.Ad.RequestAd(CrazyAdType.Midgame,
-            () => {
-                // Reklam Baþladý
-                Time.timeScale = 0f;
-            },
-            (error) => {
-                // Hata durumunda da oyunu devam ettirmeliyiz
-                Debug.LogError("Geçiþ reklamý hatasý: " + error);
-                Time.timeScale = 1f;
-                if (onComplete != null) onComplete();
-            },
-            () => {
-                // Reklam Bitti
-                Debug.Log("Geçiþ reklamý bitti.");
-                Time.timeScale = 1f;
-                if (onComplete != null) onComplete();
-            }
-        );
+        currentInterstitialCallback = onComplete;
+        
+        // SDK'ya doÄŸrudan Ã§aÄŸrÄ± yapÄ±yoruz
+        Bridge.advertisement.ShowInterstitial();
     }
 
     void TakeReward()
     {     
+        if (levelRewardManager == null) return;
 
         switch (chosenReward)
         {
             case "Revive":
-                levelRewardManager.AdRevive();
-                VehicleStackManager.Instance.gameOverPanel.SetActive(false);
+                levelRewardManager.GrantRevive();
+                if (VehicleStackManager.Instance != null && VehicleStackManager.Instance.gameOverPanel != null)
+                    VehicleStackManager.Instance.gameOverPanel.SetActive(false);
                 break;
 
             case "Gold":
-                levelRewardManager.AdFreeGold();
+                levelRewardManager.GrantFreeGold();
                 break;
 
             case "SlowGame":
-                levelRewardManager.AdActivateSlow();
+                levelRewardManager.GrantActivateSlow();
                 break;
 
             case "Health":
-                levelRewardManager.AdFreeHealth();
+                levelRewardManager.GrantFreeHealth();
                 break;
 
             case "DoubleGold":
-                levelRewardManager.ActivateDoubleReward();
+                levelRewardManager.GrantDoubleReward();
                 break;
 
             case "RandomFreeUpgrade":
-                levelRewardManager.RandomFreeUpgrade();
-                PerkManager.Instance.perkPanel.SetActive(false);
+                levelRewardManager.GrantRandomFreeUpgrade();
+                if (PerkManager.Instance != null && PerkManager.Instance.perkPanel != null)
+                    PerkManager.Instance.perkPanel.SetActive(false);
                 break;
 
             default:
-                Debug.LogWarning("Bilinmeyen ödül türü: " + chosenReward);
+                Debug.LogWarning("Bilinmeyen Ã¶dÃ¼l tÃ¼rÃ¼: " + chosenReward);
                 break;
         }
-        Debug.Log("Tebrikler! Ödül hesabýna eklendi.");
+        Debug.Log("Tebrikler! Ã–dÃ¼l hesabÄ±na eklendi.");
     }
 }
+
+

@@ -1,0 +1,3480 @@
+Bridge SDK
+API
+Reference for Playgama Bridge SDK modules.
+
+The modules below are grouped by integration priority. If you're integrating Bridge for the first time, follow Setup → Integration steps first, then use this reference for exact methods.
+
+Required for every game
+Platform — language, platform ID, sendMessage('game_ready'), audio/pause/visibility state.
+
+Storage — save and load player progress.
+
+Advertisement → Interstitial — required by all platforms for revenue share. Show at natural breakpoints (level transitions, game over).
+
+Extra monetization
+Advertisement → Rewarded, Banner, Advanced Banners, AdBlock detection — optional ad formats and diagnostics.
+
+Payments — in-game purchases (consumable and permanent).
+
+Engagement
+Leaderboards — competitive scores (in-game, native, or native popup).
+
+Achievements — milestones and rewards.
+
+Social — share, invite friends, add to favorites, join community.
+
+Optional
+Player — authorization, ID, name, avatar.
+
+Device — device type (mobile / tablet / desktop / TV).
+
+Remote Config — manage game settings without a release.
+
+In unsupported environments, such as local development without a host platform, Bridge falls back to a mock platform. Methods return safe defaults (false, reject, etc.) instead of throwing, so you can develop against the SDK before publishing.
+Bridge SDK
+API
+Reference for Playgama Bridge SDK modules.
+
+The modules below are grouped by integration priority. If you're integrating Bridge for the first time, follow Setup → Integration steps first, then use this reference for exact methods.
+
+Required for every game
+Platform — language, platform ID, sendMessage('game_ready'), audio/pause/visibility state.
+
+Storage — save and load player progress.
+
+Advertisement → Interstitial — required by all platforms for revenue share. Show at natural breakpoints (level transitions, game over).
+
+Extra monetization
+Advertisement → Rewarded, Banner, Advanced Banners, AdBlock detection — optional ad formats and diagnostics.
+
+Payments — in-game purchases (consumable and permanent).
+
+Engagement
+Leaderboards — competitive scores (in-game, native, or native popup).
+
+Achievements — milestones and rewards.
+
+Social — share, invite friends, add to favorites, join community.
+
+Optional
+Player — authorization, ID, name, avatar.
+
+Device — device type (mobile / tablet / desktop / TV).
+
+Remote Config — manage game settings without a release.
+
+In unsupported environments, such as local development without a host platform, Bridge falls back to a mock platform. Methods return safe defaults (false, reject, etc.) instead of throwing, so you can develop against the SDK before publishing.
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Authorization Support
+Is the Player Currently Authorized
+Player ID
+Player Name
+Player Avatar
+Player Extra Fields
+Player Authorization
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Player
+Optional module for player identity, profile data and platform authorization.
+
+Authorization Support
+Check this before showing a login button. Authorization support depends on the host platform.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// Possible values: true, false
+Bridge.player.isAuthorizationSupported
+Supports: absolute_games, bitquest, crazy_games, discord, facebook, huawei, microsoft_store, msn, ok, playdeck, playgama, samsung, telegram, tiktok, vk, y8, yandex
+
+Does not support: dlightek, game_distribution, gamepush, gamesnacks, jio_games, lagged, poki, portal, reddit, xiaomi, youtube
+
+Is the Player Currently Authorized
+Use this to decide whether protected features are available right now, such as account-based saves, personalized content, or social actions.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// Possible values: true, false
+Bridge.player.isAuthorized
+Player ID
+Returns the player's platform ID when available. Use it for display, analytics correlation, or backend verification, but do not rely on it until authorization is confirmed.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.player.id
+If the platform supports authorization and the player is currently authorized, this returns their platform ID. Otherwise, it returns null.
+
+Player Name
+Returns the display name provided by the platform. Use it for profile UI, leaderboards, friend lists, or social prompts.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.player.name
+Returns null when no name is available; otherwise returns a string.
+
+Player Avatar
+Returns available player avatar URLs. Use the largest suitable image for profile UI, lobbies, or leaderboard rows.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.player.photos
+Possible values: an array of avatar URLs sorted by increasing resolution, or an empty array.
+
+Player Extra Fields
+Returns platform-specific authorization data. Properties vary by platform.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.player.extra
+Use this data on your backend to verify authorization. Playgama API verification currently supports only playgama, msn, and microsoft_store.
+
+
+Copy
+curl -X POST "https://playgama.com/api/bridge/v1/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"platform":"<PLATFORM_ID>","type":"authorization","data":{  <...bridge.player.extra> }}'
+  
+#  Response:
+#  {
+#    success: boolean;
+#    errorMessage?: string;
+
+#    -- authorization --
+#    playerId?: string;
+#    publisherPlayerId?: string;
+#  }
+Player Authorization
+Start the platform authorization flow. Call this from a direct player action, such as tapping a login button, before enabling account-only features.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    Bridge.player.Authorize(options, OnAuthorizePlayerCompleted);
+}
+
+private void OnAuthorizePlayerCompleted(bool success)
+{
+    if (success)
+    {
+        // Player successfully authorized
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+Previous
+Platform
+Next
+Storage
+Last updated 1 month ago
+
+Player | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Two storage types
+Implementation order
+Current Storage Type
+Availability Check
+Load Data
+Save Data
+Delete Data
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Storage
+The Storage module persists player data: progress, settings, currency, level state. This is required for almost every game. Without it, players lose progress between sessions.
+
+Two storage types
+Type
+Persistence
+Cross-device
+Use when
+local_storage
+
+Browser/device localStorage
+
+No
+
+Default for offline, single-device progress
+
+platform_internal
+
+Platform cloud servers
+
+Yes
+
+Player is authorized and you want cross-device save
+
+bridge.storage.defaultType returns the storage type preferred by the current platform. Use it by default; pass an explicit storageType only when you need to control where the data is stored.
+
+Implementation order
+Required — On game start, call storage.get(...) for the keys you need (level, coins, settings, etc.). Restore the player's state before showing gameplay.
+
+Required — On meaningful state change (level complete, purchase, settings change), storage.set(...) to persist. Avoid saving every frame.
+
+Current Storage Type
+Read the default storage type before saving data. It tells you whether Bridge will use local browser storage or platform cloud storage.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.storage.defaultType
+Possible values: local_storage, platform_internal.
+
+Availability Check
+Check whether a storage type is available before forcing it explicitly. Availability can depend on platform support and player authorization.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.storage.IsAvailable(StorageType.LocalStorage)
+Bridge.storage.IsAvailable(StorageType.PlatformInternal)
+Load Data
+Load one key or several keys before gameplay starts. Missing keys return null, so always provide defaults in your game state.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Get data by key
+private void Start()
+{
+    Bridge.storage.Get("level", OnStorageGetCompleted);
+}
+
+private void OnStorageGetCompleted(bool success, string data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data != null)
+        {
+            Debug.Log(data);
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+
+// Get data by multiple keys
+private void Start()
+{
+    Bridge.storage.Get(new List<string>() { "level", "coins" }, OnStorageGetCompleted);
+}
+
+private void OnStorageGetCompleted(bool success, List<string> data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data[0] != null)
+        {
+            Debug.Log($"Level: {data[0]}");
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+
+        if (data[1] != null)
+        {
+            Debug.Log($"Coins: {data[1]}");
+        }
+        else
+        {
+            // No data for the key 'coins'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+
+// Get data from a specific storage type
+private void Start()
+{
+    Bridge.storage.Get("level", OnStorageGetCompleted, StorageType.LocalStorage);
+}
+
+private void OnStorageGetCompleted(bool success, string data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data != null)
+        {
+            Debug.Log(data);
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+Save Data
+Save one key or several keys after meaningful progress changes, such as level completion, purchase, currency change, or settings update.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Save data by key
+private void Start()
+{
+    Bridge.storage.Set("level", "dungeon_123", OnStorageSetCompleted);
+}
+
+private void OnStorageSetCompleted(bool success)
+{
+    Debug.Log($"OnStorageSetCompleted, success: {success}");
+}
+
+// Save data by multiple keys
+private void Start()
+{
+    var keys = new List<string>() { "level", "is_tutorial_completed", "coins" };
+    var data = new List<object>() { "dungeon_123", true, 12 };
+    Bridge.storage.Set(keys, data, OnStorageSetCompleted);
+}
+
+// Save data to a specific storage type
+private void Start()
+{
+    Bridge.storage.Set("level", "dungeon_123", OnStorageSetCompleted, StorageType.LocalStorage);
+}
+Delete Data
+Delete one key or several keys when you intentionally reset progress, clear settings, or migrate obsolete data.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Delete data by key
+private void Start()
+{
+    Bridge.storage.Delete("level", OnStorageDeleteCompleted);
+}
+
+private void OnStorageDeleteCompleted(bool success)
+{
+    Debug.Log($"OnStorageDeleteCompleted, success: {success}");
+}
+
+// Delete data by multiple keys
+private void Start()
+{
+    var keys = new List<string>() { "level", "is_tutorial_completed", "coins" };
+    Bridge.storage.Delete(keys, OnStorageDeleteCompleted);
+}
+
+// Delete data from a specific storage type
+private void Start()
+{
+    Bridge.storage.Delete("level", OnStorageDeleteCompleted, StorageType.LocalStorage);
+}
+Previous
+Player
+Next
+Advertisement
+Last updated 1 month ago
+
+Storage | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Two storage types
+Implementation order
+Current Storage Type
+Availability Check
+Load Data
+Save Data
+Delete Data
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Storage
+The Storage module persists player data: progress, settings, currency, level state. This is required for almost every game. Without it, players lose progress between sessions.
+
+Two storage types
+Type
+Persistence
+Cross-device
+Use when
+local_storage
+
+Browser/device localStorage
+
+No
+
+Default for offline, single-device progress
+
+platform_internal
+
+Platform cloud servers
+
+Yes
+
+Player is authorized and you want cross-device save
+
+bridge.storage.defaultType returns the storage type preferred by the current platform. Use it by default; pass an explicit storageType only when you need to control where the data is stored.
+
+Implementation order
+Required — On game start, call storage.get(...) for the keys you need (level, coins, settings, etc.). Restore the player's state before showing gameplay.
+
+Required — On meaningful state change (level complete, purchase, settings change), storage.set(...) to persist. Avoid saving every frame.
+
+Current Storage Type
+Read the default storage type before saving data. It tells you whether Bridge will use local browser storage or platform cloud storage.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.storage.defaultType
+Possible values: local_storage, platform_internal.
+
+Availability Check
+Check whether a storage type is available before forcing it explicitly. Availability can depend on platform support and player authorization.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.storage.IsAvailable(StorageType.LocalStorage)
+Bridge.storage.IsAvailable(StorageType.PlatformInternal)
+Load Data
+Load one key or several keys before gameplay starts. Missing keys return null, so always provide defaults in your game state.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Get data by key
+private void Start()
+{
+    Bridge.storage.Get("level", OnStorageGetCompleted);
+}
+
+private void OnStorageGetCompleted(bool success, string data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data != null)
+        {
+            Debug.Log(data);
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+
+// Get data by multiple keys
+private void Start()
+{
+    Bridge.storage.Get(new List<string>() { "level", "coins" }, OnStorageGetCompleted);
+}
+
+private void OnStorageGetCompleted(bool success, List<string> data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data[0] != null)
+        {
+            Debug.Log($"Level: {data[0]}");
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+
+        if (data[1] != null)
+        {
+            Debug.Log($"Coins: {data[1]}");
+        }
+        else
+        {
+            // No data for the key 'coins'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+
+// Get data from a specific storage type
+private void Start()
+{
+    Bridge.storage.Get("level", OnStorageGetCompleted, StorageType.LocalStorage);
+}
+
+private void OnStorageGetCompleted(bool success, string data)
+{
+    // Loading succeeded
+    if (success)
+    {
+        if (data != null)
+        {
+            Debug.Log(data);
+        }
+        else
+        {
+            // No data for the key 'level'
+        }
+    }
+    else
+    {
+        // Error, something went wrong
+    }
+}
+Save Data
+Save one key or several keys after meaningful progress changes, such as level completion, purchase, currency change, or settings update.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Save data by key
+private void Start()
+{
+    Bridge.storage.Set("level", "dungeon_123", OnStorageSetCompleted);
+}
+
+private void OnStorageSetCompleted(bool success)
+{
+    Debug.Log($"OnStorageSetCompleted, success: {success}");
+}
+
+// Save data by multiple keys
+private void Start()
+{
+    var keys = new List<string>() { "level", "is_tutorial_completed", "coins" };
+    var data = new List<object>() { "dungeon_123", true, 12 };
+    Bridge.storage.Set(keys, data, OnStorageSetCompleted);
+}
+
+// Save data to a specific storage type
+private void Start()
+{
+    Bridge.storage.Set("level", "dungeon_123", OnStorageSetCompleted, StorageType.LocalStorage);
+}
+Delete Data
+Delete one key or several keys when you intentionally reset progress, clear settings, or migrate obsolete data.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Delete data by key
+private void Start()
+{
+    Bridge.storage.Delete("level", OnStorageDeleteCompleted);
+}
+
+private void OnStorageDeleteCompleted(bool success)
+{
+    Debug.Log($"OnStorageDeleteCompleted, success: {success}");
+}
+
+// Delete data by multiple keys
+private void Start()
+{
+    var keys = new List<string>() { "level", "is_tutorial_completed", "coins" };
+    Bridge.storage.Delete(keys, OnStorageDeleteCompleted);
+}
+
+// Delete data from a specific storage type
+private void Start()
+{
+    Bridge.storage.Delete("level", OnStorageDeleteCompleted, StorageType.LocalStorage);
+}
+Previous
+Player
+Next
+Advertisement
+Last updated 1 month ago
+
+Storage | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Which format to use
+Recommended integration order
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Advertisement
+Use ads to monetize the game across supported platforms. Interstitial integration is required: every game must show interstitial ads at natural breakpoints to qualify for platform revenue share. Other formats are optional additions.
+
+Never show ads in the middle of active gameplay. Show them at natural pauses: level transitions, map changes, game over, or return to menu.
+
+Which format to use
+Format
+Status
+When to show
+Player choice
+Interstitial
+
+Required
+
+Level transitions, game over, menu→gameplay
+
+Automatic
+
+Rewarded
+
+Recommended
+
+Player opts in for an in-game reward
+
+Opt-in
+
+Banner
+
+Recommended
+
+Idle screens (menu, lobby, pause)
+
+Always visible
+
+Advanced Banners
+
+Recommended
+
+Custom banner placements with extra control
+
+Always visible
+
+AdBlock detection
+
+Optional
+
+Detect and react to blocked ads
+
+n/a
+
+Recommended integration order
+Interstitial — required. Hook into level transitions and game-over screens.
+
+Rewarded — add reward-for-watching loops: extra life, double coins, hint, skip. This usually has the highest eCPM because players opt in.
+
+Banner — fill idle screens. Start with isBannerSupported/bannerState to avoid layout glitches on platforms that don't support banners.
+
+Advanced Banners — use when default banner placement is not flexible enough.
+
+AdBlock detection — optional, useful for fallback messaging.
+
+Previous
+Storage
+Next
+Interstitial
+Last updated 1 month ago
+
+Advertisement | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Is Interstitial Supported
+Minimum Interval Between Displays
+Interstitial State
+Show Interstitial
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPIAdvertisement
+Interstitial
+Interstitials are full-screen ads shown at natural pauses: between levels, on game over, or when returning to the menu.
+
+Interstitial integration is required for SDK integration to be considered complete. Publishing platforms expect games to show interstitials at natural breakpoints. Without them, the game may not qualify for revenue share and can be rejected during moderation.
+
+Do not call showInterstitial() at game start. Platforms that allow it show it automatically; calling it explicitly can result in duplicate ads.
+
+Ad settings are stored in playgama-bridge-config.json. Use the config editor to create or update them.
+
+Is Interstitial Supported
+Check this before showing interstitial-related UI or running interstitial logic.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.isInterstitialSupported
+Minimum Interval Between Displays
+Set the minimum delay between interstitial attempts. The SDK uses this delay to prevent ads from appearing too often.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// Default value = 60 seconds
+Bridge.advertisement.minimumDelayBetweenInterstitial
+
+private void Start()
+{
+    // Set minimum interval
+    Bridge.advertisement.SetMinimumDelayBetweenInterstitial(30);
+}
+The SDK tracks the delay internally. Set the required interval once; if you call showInterstitial() too early, Bridge waits or skips according to platform behavior instead of showing ads too frequently.
+
+Interstitial State
+Check interstitialState at game start. If the state is opened, immediately mute audio and pause gameplay (or rely on the universal platform AUDIO_STATE_CHANGED / PAUSE_STATE_CHANGED handlers — see the note below).
+
+Track state changes to drive ad-specific logic. For muting and pausing, prefer the universal platform events described below instead of reacting to each ad state separately.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.interstitialState
+Possible values: Loading, Opened, Closed, Failed.
+
+
+Copy
+// To track interstitial state changes, subscribe to the event
+private void Start()
+{
+    Bridge.advertisement.interstitialStateChanged += OnInterstitialStateChanged;
+}
+
+private void OnInterstitialStateChanged(InterstitialState state)
+{
+    Debug.Log(state);
+}
+While the interstitial is open, the game must be muted and paused. The recommended way to handle this is once, in a single place, by subscribing to the platform AUDIO_STATE_CHANGED and PAUSE_STATE_CHANGED events instead of duplicating the logic per ad type. Bridge raises those events whenever the host requests it — interstitials, rewarded ads, browser tab switches, system pauses — so a single universal handler covers every case.
+
+Show Interstitial
+Request an interstitial at a natural pause, such as a level transition, game over screen, or return to menu.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+private void Start()
+{
+    var placement = "test_placement"; // optional
+    Bridge.advertisement.ShowInterstitial(placement);
+}
+Do not call showInterstitial() at game start. Platforms that allow a start-of-game interstitial handle it automatically.
+
+Previous
+Advertisement
+Next
+Rewarded
+Last updated 1 month ago
+
+Interstitial | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+When to use
+Is Rewarded Supported
+Rewarded State
+Rewarded Placement
+Show Rewarded Ad
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPIAdvertisement
+Rewarded
+Rewarded ads are opt-in full-screen ads. The player chooses to watch in exchange for an in-game reward, such as an extra life, double coins, a hint, or a skip. They usually have high eCPM and low friction because the player consents.
+
+When to use
+The player can use a small boost (revive, extra hint, skip a hard level).
+
+You have premium content gated behind a soft paywall — let non-paying players unlock it via an ad.
+
+You want to convert engagement into revenue without hurting retention.
+
+Reward the player only when the state is rewarded. Granting on closed lets players claim rewards without watching the ad.
+
+Ad settings are stored in playgama-bridge-config.json. Use the config editor to create or update them.
+
+Is Rewarded Supported
+Check this before showing a rewarded-ad button.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.isRewardedSupported
+Rewarded State
+Track state changes to grant the reward only when the final state is rewarded. For muting and pausing the game, prefer the universal platform AUDIO_STATE_CHANGED / PAUSE_STATE_CHANGED events described below instead of reacting to each ad state separately.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.rewardedState
+Possible values: Loading, Opened, Closed, Rewarded, Failed.
+
+
+Copy
+// To track rewarded ad state changes, subscribe to the event
+private void Start()
+{
+    Bridge.advertisement.rewardedStateChanged += OnRewardedStateChanged;
+}
+
+private void OnRewardedStateChanged(RewardedState state)
+{
+    Debug.Log(state);
+}
+While the rewarded ad is open, the game must be muted and paused. The recommended way to handle this is once, in a single place, by subscribing to the platform AUDIO_STATE_CHANGED and PAUSE_STATE_CHANGED events instead of duplicating the logic per ad type. Bridge raises those events whenever the host requests it — interstitials, rewarded ads, browser tab switches, system pauses — so a single universal handler covers every case.
+
+Reward the player only when the state is rewarded.
+
+Rewarded Placement
+Read the current rewarded placement when one button can request different rewards. Use it to decide which reward to grant after the state becomes rewarded.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.advertisement.rewardedPlacement
+Show Rewarded Ad
+Request a rewarded ad from a direct player action, such as tapping "Watch ad for reward".
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+private void Start()
+{
+    var placement = "test_placement"; // optional
+    Bridge.advertisement.ShowRewarded(placement);
+}
+Previous
+Interstitial
+Next
+Banner
+Last updated 1 month ago
+
+Rewarded | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+When to use
+Is Banner Supported
+Show Banner
+Hide Banner
+Banner State
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPIAdvertisement
+Banner
+Banners are persistent ads pinned to the top or bottom of the screen. Use them on idle screens — main menu, lobby, pause overlay — and hide them during active gameplay.
+
+When to use
+You have a stable UI region where a banner won't overlap with controls.
+
+You want medium-tier passive monetization without interrupting the player.
+
+For more flexible placements (multiple banners, custom positions, responsive layouts) use Advanced Banners instead.
+
+Is Banner Supported
+Check this before reserving screen space or showing banner UI. Hide banner areas on platforms that do not support banners.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+// Possible values: true, false
+Bridge.advertisement.isBannerSupported
+Show Banner
+Show a banner in a stable UI area where it will not overlap gameplay controls.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+private void Start()
+{
+    var position = BannerPosition.Bottom; // optional, 'Top' | 'Bottom', default = Bottom
+    var placement = "test_placement"; // optional
+    Bridge.advertisement.ShowBanner(position, placement);
+}
+Hide Banner
+Hide the current banner before gameplay resumes or when the screen no longer has safe space for it.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.HideBanner()
+Banner State
+Track banner state to adjust layout, avoid empty ad space, and debug failed loads.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+
+Copy
+Bridge.advertisement.bannerState
+Possible values: Loading, Shown, Hidden, Failed.
+
+
+Copy
+// To track banner state changes, subscribe to the event
+private void Start()
+{
+    Bridge.advertisement.bannerStateChanged += OnBannerStateChanged;
+}
+
+private void OnBannerStateChanged(BannerState state)
+{
+    Debug.Log(state);
+}
+Previous
+Rewarded
+Next
+Advanced Banners
+Last updated 1 month ago
+
+Banner | Playgama
+
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+When to use Advanced Banners over regular Banner
+Automatic behavior
+Checking Support
+Usage
+Method 1: Explicit API Call
+Method 2: Automatic via Platform Messages
+Tracking State
+Automatic Behavior
+Fullscreen Ad Coordination
+Responsive Re-evaluation
+Complete Example
+Config
+Game Code
+Configuration
+General Options
+Placement Configuration
+Banner Object
+Condition Keys
+Available Segments
+Combining Segments
+Priority Scoring
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPIAdvertisement
+Advanced Banners
+Advanced Banners let you define responsive banner layouts that adapt to device type, orientation, and screen size. Unlike regular banners, which support one top/bottom placement, Advanced Banners can render multiple banners at custom positions and switch layouts automatically when conditions change.
+
+When to use Advanced Banners over regular Banner
+You need banner placement other than top/bottom (corners, sides, multiple banners at once).
+
+Layouts must differ between mobile and desktop, or portrait and landscape.
+
+You want banner visibility to react to game lifecycle messages (e.g. show on level_paused, hide on level_resumed) without writing show/hide calls everywhere.
+
+Automatic behavior
+Fullscreen ad coordination — Advanced Banners are auto-hidden when an interstitial or rewarded opens, and restored when it closes/fails.
+
+Responsive re-evaluation — on orientation change or window resize, Bridge re-evaluates condition keys and switches to the best-matching variant (200ms debounce).
+
+Advanced Banner settings are stored in playgama-bridge-config.json. Use the config editor to create or update them.
+
+Checking Support
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+if (Bridge.advertisement.isAdvancedBannersSupported)
+{
+    // Advanced Banners are available
+}
+Usage
+Method 1: Explicit API Call
+Show and hide Advanced Banners directly from game code when placement timing is controlled by your own UI flow.
+
+Show Advanced Banners
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// Show banners for a specific placement
+Bridge.advertisement.ShowAdvancedBanners("main_menu");
+If placementFallback is set in the config, you can call without arguments:
+
+
+Copy
+Bridge.advertisement.ShowAdvancedBanners();
+Hide Advanced Banners
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.advertisement.HideAdvancedBanners();
+Method 2: Automatic via Platform Messages
+Advanced Banners can react to platform messages. When you send a built-in or custom message, Bridge checks whether the config has a matching placement and runs that placement action.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// This will automatically show banners if "level_paused" placement is configured
+Bridge.platform.SendMessage(PlatformMessage.LevelPaused);
+
+// This will hide banners if "level_resumed" has action: "hide"
+Bridge.platform.SendMessage(PlatformMessage.LevelResumed);
+
+// Custom messages work the same way
+Bridge.platform.SendCustomMessage("shop_opened");
+This is the recommended approach because banner visibility follows your game lifecycle without extra show/hide calls.
+
+Tracking State
+Possible values: loading, shown, hidden, failed.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+// Check current state
+BannerState state = Bridge.advertisement.advancedBannersState;
+// Possible values: BannerState.Loading, BannerState.Shown, BannerState.Hidden, BannerState.Failed
+
+// Listen for state changes
+Bridge.advertisement.advancedBannersStateChanged += OnAdvancedBannersStateChanged;
+
+private void OnAdvancedBannersStateChanged(BannerState state)
+{
+    switch (state)
+    {
+        case BannerState.Loading:
+            // Banners are being loaded
+            break;
+        case BannerState.Shown:
+            // Banners are visible
+            break;
+        case BannerState.Hidden:
+            // Banners were hidden
+            break;
+        case BannerState.Failed:
+            // Banners failed to load
+            break;
+    }
+}
+Unsubscribe when the listener is no longer needed:
+
+
+Copy
+Bridge.advertisement.advancedBannersStateChanged -= OnAdvancedBannersStateChanged;
+Automatic Behavior
+Fullscreen Ad Coordination
+Advanced Banners are automatically hidden when an interstitial or rewarded ad starts (loading or opened) and automatically restored when the ad finishes (closed or failed). No extra code is needed.
+
+
+Copy
+Interstitial starts → Advanced Banners hidden
+Interstitial ends   → Advanced Banners restored
+
+Rewarded starts     → Advanced Banners hidden
+Rewarded ends       → Advanced Banners restored
+Responsive Re-evaluation
+When the screen orientation changes or the window is resized, Bridge re-evaluates conditions and switches to a better-matching variant if one exists. This uses a 200ms debounce to avoid excessive updates.
+
+For example, if the player rotates a phone from portrait to landscape and your config has layouts for both orientations, Bridge switches banners automatically.
+
+Complete Example
+Config
+
+Copy
+{
+    "advertisement": {
+        "advancedBanners": {
+            "placementFallback": "gameplay_stopped",
+            "gameplay_started": {
+                "action": "hide"
+            },
+            "gameplay_stopped": {
+                "action": "show",
+                "default": [
+                    { "width": "20%", "height": "25%", "bottom": "10%", "right": "5%" }
+                ],
+                "mobile:portrait": [
+                    { "width": "100%", "height": "8%", "bottom": "0", "left": "0" }
+                ],
+                "mobile:landscape": [
+                    { "width": "25%", "height": "40%", "top": "30%", "right": "0" }
+                ],
+                "desktop:w>1200": [
+                    { "width": "10%", "height": "60%", "top": "10%", "left": "1%" },
+                    { "width": "10%", "height": "60%", "top": "10%", "right": "1%" }
+                ],
+                "desktop:w<=1200": [
+                    { "width": "60%", "height": "10%", "bottom": "0", "left": "20%" }
+                ],
+                "desktop:landscape:ar>=1.78": [
+                    { "width": "12%", "height": "70%", "top": "5%", "left": "0" },
+                    { "width": "12%", "height": "70%", "top": "5%", "right": "0" },
+                    { "width": "50%", "height": "10%", "bottom": "0", "left": "25%" }
+                ]
+            },
+            "<your_placement_here>": {
+                "default": [
+                    { "width": "60%", "height": "10%", "bottom": "0", "left": "20%" }
+                ]
+            },
+            "<your_placement_here>": {
+                "action": "hide"
+            }
+        }
+    }
+}
+Game Code
+
+Plain JS
+
+Unity
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+using Playgama;
+using Playgama.Modules.Advertisement;
+using Playgama.Modules.Platform;
+
+public class AdManager : MonoBehaviour
+{
+    private void Start()
+    {
+        Bridge.advertisement.advancedBannersStateChanged += OnAdvancedBannersStateChanged;
+    }
+
+    public void OnGameplayStarted()
+    {
+        // Hides banners automatically via config
+        Bridge.platform.SendMessage(PlatformMessage.GameplayStarted);
+    }
+
+    public void OnGameplayStopped()
+    {
+        // Shows banners automatically (best layout auto-selected)
+        Bridge.platform.SendMessage(PlatformMessage.GameplayStopped);
+    }
+
+    public void OnShopOpened()
+    {
+        // Custom messages work the same way
+        Bridge.platform.SendCustomMessage("your_placement_here");
+    }
+
+    public void OnShopClosed()
+    {
+        Bridge.platform.SendCustomMessage("your_placement_here");
+    }
+
+    public void ShowBannersDirectly()
+    {
+        // Or call directly
+        Bridge.advertisement.ShowAdvancedBanners("gameplay_stopped");
+    }
+
+    public void HideBannersDirectly()
+    {
+        Bridge.advertisement.HideAdvancedBanners();
+    }
+
+    private void OnAdvancedBannersStateChanged(BannerState state)
+    {
+        Debug.Log($"Advanced Banners: {state}");
+    }
+
+    private void OnDestroy()
+    {
+        Bridge.advertisement.advancedBannersStateChanged -= OnAdvancedBannersStateChanged;
+    }
+}
+Configuration
+Use the config editor to configure Advanced Banners in playgama-bridge-config.json under advertisement.advancedBanners.
+
+
+Copy
+{
+    "advertisement": {
+        "advancedBanners": {
+            "disable": false,
+            "placementFallback": "main_menu",
+            "main_menu": {
+                "default": [
+                    { "width": "20%", "height": "25%", "top": "10%", "right": "10%" }
+                ]
+            },
+            "level_paused": {
+                "action": "show",
+                "default": [
+                    { "width": "20%", "height": "25%", "top": "10%", "right": "10%" }
+                ],
+                "mobile:portrait": [
+                    { "width": "100%", "height": "10%", "bottom": "0", "left": "0" }
+                ],
+                "desktop:landscape:w>1200": [
+                    { "width": "10%", "height": "60%", "top": "10%", "left": "2%" },
+                    { "width": "10%", "height": "60%", "top": "10%", "right": "2%" }
+                ]
+            },
+            "level_resumed": {
+                "action": "hide"
+            }
+        }
+    }
+}
+General Options
+Parameter
+Type
+Default
+Description
+disable
+
+boolean
+
+false
+
+Disable Advanced Banners entirely, even if the platform supports them
+
+placementFallback
+
+string
+
+—
+
+Default placement to use when Show Advanced Banners is called without a placement
+
+Placement Configuration
+Each key under advancedBanners except disable and placementFallback defines a placement. A placement is identified by a string that matches either:
+
+A built-in or custom platform message, such as game_ready, level_paused, or gameplay_started
+
+A custom message ID passed to Send Custom Message
+
+A string passed directly to Show Advanced Banners
+
+Each placement contains:
+
+Property
+Type
+Default
+Description
+action
+
+"show" | "hide"
+
+"show"
+
+Whether to show or hide banners when this placement is triggered
+
+default
+
+array
+
+—
+
+Fallback banner layout when no condition-based variant matches
+
+condition key
+
+array
+
+—
+
+Banner layout for a specific set of conditions (see Condition Keys below)
+
+Banner Object
+Each banner in the array is an object with CSS positioning values:
+
+Property
+Type
+Description
+width
+
+string
+
+CSS width (e.g. "300px", "100%")
+
+height
+
+string
+
+CSS height (e.g. "250px", "80px")
+
+top
+
+string
+
+CSS top offset (e.g. "0", "10%")
+
+bottom
+
+string
+
+CSS bottom offset
+
+left
+
+string
+
+CSS left offset
+
+right
+
+string
+
+CSS right offset
+
+You can define multiple banners per variant to show several ads simultaneously:
+
+
+Copy
+"desktop:landscape": [
+    { "width": "10%", "height": "60%", "top": "10%", "left": "2%" },
+    { "width": "10%", "height": "60%", "top": "10%", "right": "2%" },
+    { "width": "40%", "height": "10%", "bottom": "0", "left": "30%" }
+]
+Condition Keys
+Condition keys are colon-separated segments that describe when a variant should be used. Bridge evaluates all keys against the current environment and picks the best match.
+
+Available Segments
+Segment
+Example
+Description
+Device type
+
+mobile, desktop, tablet, tv
+
+Matches the current device type
+
+Orientation
+
+portrait, landscape
+
+Matches the current screen orientation
+
+Width condition
+
+w>600, w<=1024, w>=768
+
+Matches against window width (or canvas width if canvas segment is present)
+
+Height condition
+
+h>400, h<=900
+
+Matches against window height (or canvas height)
+
+Aspect ratio
+
+ar>1.5, ar>=1.78, ar<=1.0
+
+Matches screen width/height ratio
+
+Canvas mode
+
+canvas
+
+Use game canvas dimensions instead of window size for all w/h/ar conditions. If no canvas is found, the variant will not match
+
+Combining Segments
+Combine segments with : to create compound conditions. All segments must match for the variant to be selected:
+
+
+Copy
+{
+    "mobile:portrait": [...],
+    "mobile:portrait:w>400": [...],
+    "desktop:landscape:w>1200:ar>=1.5": [...],
+    "tablet:canvas:w>800": [...]
+}
+Priority Scoring
+When multiple variants match, the one with the highest score wins:
+
+Segment Type
+Score
+Device type (mobile, desktop, etc.)
+
++4
+
+Orientation (portrait, landscape)
+
++2
+
+Canvas mode (canvas)
+
++1
+
+Each dimension/aspect ratio condition
+
++1
+
+If two variants have the same score, the one with more segments wins. If they also have the same number of segments, the one whose dimension/aspect ratio threshold is closest to the actual value takes priority.
+
+Example: screen is 1300px wide, device is desktop
+
+Key
+Matches?
+Score
+default
+
+yes (fallback)
+
+-1
+
+desktop
+
+yes
+
+4
+
+desktop:w>500
+
+yes
+
+4 + 1 = 5
+
+desktop:w>1200
+
+yes
+
+5 + higher specificity bonus
+
+desktop:landscape:w>1200
+
+yes
+
+4 + 2 + 1 = 7
+
+mobile:portrait
+
+no
+
+—
+
+Previous
+Banner
+Next
+AdBlock
+Last updated 1 month ago
+
+Advanced Banners | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPIAdvertisement
+AdBlock
+Detect whether the player has an ad blocker enabled. This is informational only: it does not suppress ads, but it lets you adapt UI, skip empty banner slots, or show a polite prompt.
+
+Call this when you need to adapt ad-related UI for players with blocked ads.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+private void Start()
+{
+    Bridge.advertisement.CheckAdBlock(OnCheckAdBlockCompleted);
+}
+
+private void OnCheckAdBlockCompleted(bool result)
+{
+    Debug.Log(result); // true or false
+}
+Previous
+Advanced Banners
+Next
+Social
+Last updated 1 month ago
+
+AdBlock | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+On this page
+Share
+Join Community
+Invite Friends
+Create Post
+Add to Favorites
+Add to Home Screen
+Rate Game
+External Links
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Social
+Social features help players invite friends, return more often, and share results. Every method here is optional — pick only the ones that fit your game and target platforms. None are required for SDK initialization.
+
+Trigger social actions only from direct player input. Automatic calls on game start, level complete, or similar events violate many platform policies and can get the game rejected.
+
+Share
+Let players share a score, achievement, or game link. Show the share button only when sharing is supported.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isShareSupported
+Use this flag to decide whether to show the share button.
+
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    switch (Bridge.platform.id)
+    {
+        case "vk":
+            options.Add("link", "YOUR_LINK");
+            break;
+        case "facebook":
+            options.Add("image", "A base64 encoded image to be shared");
+            options.Add("text", "A text message to be shared");
+            break;
+        case "msn":
+            options.Add("title", "A title to display");
+            options.Add("image", "A base64 encoded image or image URL to be shared");
+            options.Add("text", "A text message to be shared");
+            break;
+    }
+
+    Bridge.social.Share(options, OnShareCompleted);
+}
+
+private void OnShareCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Join Community
+Let players join your game community, page, or group from inside the game.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isJoinCommunitySupported
+Use this flag to decide whether to show the join-community button.
+
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    switch (Bridge.platform.id)
+    {
+        case "vk":
+            options.Add("groupId", YOUR_GROUP_ID);
+            break;
+        case "ok":
+            options.Add("groupId", YOUR_GROUP_ID);
+            break;
+        case "facebook":
+            options.Add("isPage", true); // if isPage = true, invite to page, else invite to group
+            break;
+    }
+
+    Bridge.social.JoinCommunity(options, OnJoinCommunityCompleted);
+}
+
+private void OnJoinCommunityCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Invite Friends
+Let players invite friends to the current game session or game page.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isInviteFriendsSupported
+Use this flag to decide whether to show the invite-friends button.
+
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    switch (Bridge.platform.id)
+    {
+        case "ok":
+            options.Add("text", "Hello World!");
+            break;
+        case "facebook":
+            options.Add("image", "A base64 encoded image to be shared");
+            options.Add("text", "A text message to be shared");
+            break;
+    }
+
+    Bridge.social.InviteFriends(options, OnInviteFriendsCompleted);
+}
+
+private void OnInviteFriendsCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Create Post
+Let players create a platform post from inside the game. Use only on platforms that support this flow.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isCreatePostSupported
+Use this flag to decide whether to show the create-post button.
+
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    switch (Bridge.platform.id)
+    {
+        case "ok":
+            var media = new object[]
+            {
+                new Dictionary<string, object>
+                {
+                    { "type", "text" },
+                    { "text", "Hello World!" },
+                },
+                new Dictionary<string, object>
+                {
+                    { "type", "link" },
+                    { "url", "https://apiok.ru" },
+                },
+                new Dictionary<string, object>
+                {
+                    { "type", "poll" },
+                    { "question", "Do you like our API?" },
+                    {
+                        "answers",
+                        new object[]
+                        {
+                            new Dictionary<string, object>
+                            {
+                                { "text", "Yes" },
+                            },
+                            new Dictionary<string, object>
+                            {
+                                { "text", "No" },
+                            }
+                        }
+                    },
+                    { "options", "SingleChoice,AnonymousVoting" },
+                },
+            };
+
+            options.Add("media", media);
+            break;
+    }
+
+    Bridge.social.CreatePost(options, OnCreatePostCompleted);
+}
+
+private void OnCreatePostCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Add to Favorites
+Let players add the game to the platform's favorites or bookmarks.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isAddToFavoritesSupported
+Use this flag to decide whether to show the add-to-favorites button.
+
+
+Copy
+private void Start()
+{
+    Bridge.social.AddToFavorites(OnAddToFavoritesCompleted);
+}
+
+private void OnAddToFavoritesCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Add to Home Screen
+Let players add a shortcut to the game on their home screen or launcher.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isAddToHomeScreenSupported
+Use this flag to decide whether to show the add-to-home-screen button.
+
+
+Copy
+private void Start()
+{
+    Bridge.social.AddToHomeScreen(OnAddToHomeScreenCompleted);
+}
+
+private void OnAddToHomeScreenCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+Rate Game
+Open the platform's rating flow. Trigger it after a positive moment, such as completing a level or returning after several sessions.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isRateSupported
+Use this flag to decide whether to show the rate-game button.
+
+
+Copy
+private void Start()
+{
+    Bridge.social.Rate(OnRateCompleted);
+}
+
+private void OnRateCompleted(bool success)
+{
+    if (success)
+    {
+        // Operation succeeded
+    }
+    else
+    {
+        // An error occurred
+    }
+}
+External Links
+Check whether the platform allows links that leave the host environment, such as your official site, support page, or community page.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.social.isExternalLinksAllowed
+If this is false, hide external links or replace them with platform-approved navigation.
+
+Previous
+AdBlock
+Next
+Leaderboards
+Last updated 1 month ago
+
+Social | Playgama
+
+
+Playgama
+Search…
+Ctrl
+k
+
+Playgama
+Welcome
+Quick start
+Submitting a game
+Game Requirements
+
+FAQ
+
+
+Guides
+Monetization
+
+Performance & Optimization
+
+Unity
+
+
+Bridge SDK
+Getting started
+Setup
+API
+
+Platform
+Player
+Storage
+Advertisement
+
+Interstitial
+Rewarded
+Banner
+Advanced Banners
+AdBlock
+Social
+Leaderboards
+Achievements
+Payments
+Device
+Remote Config
+SaaS (beta)
+
+Changelog
+LLMS
+
+For Partners
+Getting Started
+Embed the Widget
+
+Import the Game Catalog
+Share your referral Game Link
+How to Set Up White-Label Portal
+
+Playgama AD
+Getting Started
+Standalone solution
+Fallback Solution
+
+Articles
+Introducing Web-based Game Engine Rankings: First Issue (H1 2025)
+Introducing the Web Games Industry Market Map (2026)
+Unity’s Dominance Challenged in Web Gaming. Playgama.com Maps Top Engines Across Web-Game Categories
+How to Optimize Unity's Build Size
+
+Powered by GitBook
+
+
+
+For the complete documentation index, see llms.txt. This page is also available as Markdown.
+
+Copy
+
+Bridge SDKAPI
+Achievements
+Use achievements to mark in-game milestones, such as defeating the first boss or collecting 100 coins. Optional. Check isSupported, then call unlock(...) when the criteria are met.
+
+Unlike Leaderboards and Payments, achievement IDs are configured in each platform's developer dashboard, not in playgama-bridge-config.json. Keep a constants file that maps your in-game milestones to platform achievement IDs.
+
+Support
+
+Check this before enabling achievement logic or showing achievement UI.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.achievements.isSupported
+Check this before calling getList(...). Some platforms can unlock achievements but cannot return the full list.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.achievements.isGetListSupported
+Check this before showing a native achievement overlay.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+Bridge.achievements.isNativePopupSupported
+Unlock achievement
+
+Unlock an achievement after the player meets its in-game condition. Send each achievement only once.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+private void Start()
+{
+    var options = new Dictionary<string, object>();
+
+    switch (Bridge.platform.id)
+    {
+        case "y8":
+            options.Add("achievement", "ACHIEVEMENT_NAME");
+            options.Add("achievementkey", "ACHIEVEMENT_KEY");
+            break;
+        case "lagged":
+            options.Add("achievement", "ACHIEVEMENT_ID");
+            break;
+    }
+
+    Bridge.achievements.Unlock(options, OnAchievementsUnlockCompleted);
+}
+
+private void OnAchievementsUnlockCompleted(bool success, Dictionary<string, string> result)
+{
+    Debug.Log(success);
+}
+Get List
+
+Returns the achievement list when the platform supports it. The returned fields are platform-specific.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+private void Start()
+{
+    Bridge.achievements.GetList(OnGetListCompleted);
+}
+
+private void OnGetListCompleted(bool success, List<Dictionary<string, string>> list)
+{
+    Debug.Log($"OnGetListCompleted, success: {success}, items:");
+                
+    if (success)
+    {
+        switch (Bridge.platform.id)
+        {
+             case "y8":
+                 foreach (var item in list)
+                 {
+                     Debug.Log("achievementid:" + item["achievementid"]);
+                     Debug.Log("achievement:" + item["achievement"]);
+                     Debug.Log("achievementkey:" + item["achievementkey"]);
+                     Debug.Log("description:" + item["description"]);
+                     Debug.Log("icon:" + item["icon"]);
+                     Debug.Log("difficulty:" + item["difficulty"]);
+                     Debug.Log("secret:" + item["secret"]);
+                     Debug.Log("awarded:" + item["awarded"]);
+                     Debug.Log("game:" + item["game"]);
+                     Debug.Log("link:" + item["link"]);
+                     Debug.Log("playerid:" + item["playerid"]);
+                     Debug.Log("playername:" + item["playername"]);
+                     Debug.Log("lastupdated:" + item["lastupdated"]);
+                     Debug.Log("date:" + item["date"]);
+                     Debug.Log("rdate:" + item["rdate"]);
+                 }
+                 break;
+        }
+    }
+}
+Show Native Popup
+
+Some platforms can show a built-in achievement overlay. Use it instead of building custom UI when available.
+
+
+Plain JS
+
+Unity
+
+Construct 3
+
+GDevelop
+
+Godot
+
+GameMaker
+
+Defold
+
+Cocos Creator
+
+Copy
+private void Start()
+{
+    Bridge.achievements.ShowNativePopup(options, (success) =>
+    {
+        Debug.Log($"OnShowNativePopupCompleted, success: {success}");
+    });
+}
+Previous
+Leaderboards
+Next
+Payments
+Last updated 1 month ago
+
+Achievements | Playgama

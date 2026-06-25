@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -14,14 +14,14 @@ public class PerkManager : MonoBehaviour
         public string description;
         public Sprite icon;
         public PerkType type;
-        public float value; // Bu yeni perk için buraya ne yazdýðýnýn önemi yok (0 kalabilir)
+        public float value; // Bu yeni perk iÃ§in buraya ne yazdÄ±ÄŸÄ±nÄ±n Ã¶nemi yok (0 kalabilir)
     }
 
     public enum PerkType { DamageBoost, FireRateBoost, CritChanceBoost, GoldBoost, UpgradeLowest, RandomFreeUpgrade }
 
     [Header("Ayarlar")]
     public GameObject perkPanel;
-    public PerkCardUI[] cardSlots; // Script isminin projendeki adla (PerkCardUI) ayný olduðuna emin ol.
+    public PerkCardUI[] cardSlots; // Script isminin projendeki adla (PerkCardUI) aynÄ± olduÄŸuna emin ol.
     public List<PerkData> availablePerks;
 
     [Header("Durum")]
@@ -65,23 +65,23 @@ public class PerkManager : MonoBehaviour
         VehicleStackManager stackManager = Object.FindFirstObjectByType<VehicleStackManager>();
         UpgradeManager upgradeManager = Object.FindFirstObjectByType<UpgradeManager>();
 
-        // --- 1. GLOBAL STAT PERKLERÝ (Tüm silahlarý anýnda etkiler) ---
+        // --- 1. GLOBAL STAT PERKLERÄ° (TÃ¼m silahlarÄ± anÄ±nda etkiler) ---
         if (perk.type == PerkType.DamageBoost)
         {
             VehicleWeapon.globalPerkDamageMultiplier += perk.value;
-            Debug.Log($" [PERK UYGULANDI] Hasar Artýrýldý! Eklenen: +{perk.value} | Yeni Hasar Çarpaný: {VehicleWeapon.globalPerkDamageMultiplier}x");
+            Debug.Log($" [PERK UYGULANDI] Hasar ArtÄ±rÄ±ldÄ±! Eklenen: +{perk.value} | Yeni Hasar Ã‡arpanÄ±: {VehicleWeapon.globalPerkDamageMultiplier}x");
         }
         else if (perk.type == PerkType.FireRateBoost)
         {
             VehicleWeapon.globalPerkFireRateMultiplier += perk.value;
-            Debug.Log($" [PERK UYGULANDI] Atýþ Hýzý Artýrýldý! Eklenen: +{perk.value} | Yeni Hýz Çarpaný: {VehicleWeapon.globalPerkFireRateMultiplier}x");
+            Debug.Log($" [PERK UYGULANDI] AtÄ±ÅŸ HÄ±zÄ± ArtÄ±rÄ±ldÄ±! Eklenen: +{perk.value} | Yeni HÄ±z Ã‡arpanÄ±: {VehicleWeapon.globalPerkFireRateMultiplier}x");
         }
         else if (perk.type == PerkType.CritChanceBoost)
         {
             VehicleWeapon.globalPerkCritChanceAdd += perk.value;
-            Debug.Log($" [PERK UYGULANDI] Kritik Þansý Artýrýldý! Eklenen: +%{perk.value} | Toplam Ekstra Þans: %{VehicleWeapon.globalPerkCritChanceAdd}");
+            Debug.Log($" [PERK UYGULANDI] Kritik ÅžansÄ± ArtÄ±rÄ±ldÄ±! Eklenen: +%{perk.value} | Toplam Ekstra Åžans: %{VehicleWeapon.globalPerkCritChanceAdd}");
         }
-        // --- 2. ALTIN VE SÝLAH LEVELÝ PERKLERÝ ---
+        // --- 2. ALTIN VE SÄ°LAH LEVELÄ° PERKLERÄ° ---
         else if (stackManager != null)
         {
             if (perk.type == PerkType.GoldBoost)
@@ -94,13 +94,19 @@ public class PerkManager : MonoBehaviour
             }
         }
 
-        // --- 3. BEDAVA UPGRADE PERKÝ (Yeni Baðlantý) ---
-        if (perk.type == PerkType.RandomFreeUpgrade && upgradeManager != null)
+                // --- 3. BEDAVA UPGRADE PERKÄ° (AD TRIGGER) ---
+        if (perk.type == PerkType.RandomFreeUpgrade)
         {
-            upgradeManager.ApplyRandomFreeUpgrade();
+            // EÄŸer bu perk seÃ§ilirse reklam yÃ¶neticisini Ã§aÄŸÄ±rÄ±yoruz
+            if (CrazyGamesManager.Instance != null)
+            {
+                CrazyGamesManager.Instance.RewardedAdShow("RandomFreeUpgrade");
+            }
+            // Reklam aÃ§Ä±lacaÄŸÄ± iÃ§in paneli ÅŸimdi kapatmÄ±yoruz ve oyunu devam ettirmiyoruz.
+            // Ã–dÃ¼l izlendikten sonra CrazyGamesManager zaten GrantRandomFreeUpgrade'i Ã§aÄŸÄ±rÄ±p ekranÄ± kapatacak.
+            return; 
         }
-
-        // Paneli Kapat ve Oyunu Devam Ettir
+// Paneli Kapat ve Oyunu Devam Ettir
         perkPanel.SetActive(false);
         Time.timeScale = 1f;
         isPerkActive = false;
