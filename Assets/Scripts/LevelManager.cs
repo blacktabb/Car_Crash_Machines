@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Playgama;
-using Playgama.Modules.Platform;
 using TMPro;
 using System.Collections;
 
@@ -187,7 +185,6 @@ public class LevelManager : MonoBehaviour
 
     void LevelComplete()
     {
-        Bridge.platform.SendMessage(PlatformMessage.GameplayStopped);
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.SetSFXState(false);
@@ -207,7 +204,6 @@ public class LevelManager : MonoBehaviour
 
     public void HandleLevelFailed()
     {
-        Bridge.platform.SendMessage(PlatformMessage.GameplayStopped);
         // ses efekti oynat
         if (AudioManager.Instance != null) AudioManager.Instance.PlayLose();
         // ...
@@ -298,7 +294,6 @@ public class LevelManager : MonoBehaviour
 
     public void ResumeAfterRevive()
     {
-        Bridge.platform.SendMessage(PlatformMessage.GameplayStarted);
         isLevelFinished = false;
 
         if (spawner != null)

@@ -1,8 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using TMPro;
-using Playgama;
-using Playgama.Modules.Platform;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,11 +12,11 @@ public class GameManager : MonoBehaviour
     [Header("Başlangıç UI Ayarları")]
     public GameObject tapToPlayPanel;
     public TextMeshProUGUI flashingText;
-    public float blinkSpeed = 5f; // Animasyon hızı (Daha hızlı nefes alsın diye artırabilirsin)
+    public float blinkSpeed = 5f;
 
     [Header("Oyun Hızı")]
     public float targetSpeed = 5f;
-    public float maxTargetSpeed = 12f; // --- YENİ: Maksimum Hız Sınırı ---
+    public float maxTargetSpeed = 12f;
 
     [HideInInspector]
     public float gameSpeed = 0f;
@@ -46,8 +44,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Bridge.platform.SendMessage(PlatformMessage.GameReady);
-        // Başlangıçta hedef hızın sınırı aşmadığından emin ol
         targetSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
 
         if (isFirstLaunch)
@@ -70,20 +66,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // --- YENİ: HIZ SABİTLEME (CLAMP) ---
-        // Eğer targetSpeed bir şekilde sınırı geçerse, onu sınır değerine geri çekiyoruz.
         if (targetSpeed > maxTargetSpeed)
         {
             targetSpeed = maxTargetSpeed;
         }
 
-        // Eğer oyun akıyorsa ve bir yavaşlatma efekti aktif değilse, 
-        // oyun hızını hedef hıza eşitliyoruz. (Böylece dışarıdan artışlar anında yansır)
         if (!waitingForInput && slowRoutine == null)
         {
             gameSpeed = targetSpeed;
         }
-        // -----------------------------------
 
         if (waitingForInput)
         {
@@ -107,18 +98,15 @@ public class GameManager : MonoBehaviour
 
     public void StartGameLogic()
     {
-        Bridge.platform.SendMessage(PlatformMessage.GameplayStarted);
         waitingForInput = false;
         isFirstLaunch = false;
 
-        // Başlarken de sınırı koruyalım
         gameSpeed = Mathf.Min(targetSpeed, maxTargetSpeed);
 
         if (tapToPlayPanel != null)
             tapToPlayPanel.SetActive(false);
     }
 
-    // --- HIZ YAVAŞLATMA SİSTEMİ ---
     public void SlowGame(float duration)
     {
         if (slowRoutine != null)
@@ -128,7 +116,6 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator SlowRoutine(float duration)
-
     {
         float originalSpeed = targetSpeed;
 
@@ -136,7 +123,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         if (!waitingForInput)
-            gameSpeed = targetSpeed; // originalSpeed yerine direkt güncel targetSpeed'e dön
+            gameSpeed = targetSpeed;
 
         slowRoutine = null;
     }
