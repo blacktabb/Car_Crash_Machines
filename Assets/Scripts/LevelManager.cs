@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
+using CrazyGames;
 
 public class LevelManager : MonoBehaviour
 {
@@ -185,6 +186,7 @@ public class LevelManager : MonoBehaviour
 
     void LevelComplete()
     {
+        CrazySDK.Game.GameplayStop();
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.SetSFXState(false);
@@ -204,6 +206,7 @@ public class LevelManager : MonoBehaviour
 
     public void HandleLevelFailed()
     {
+        CrazySDK.Game.GameplayStop();
         // ses efekti oynat
         if (AudioManager.Instance != null) AudioManager.Instance.PlayLose();
         // ...
@@ -294,6 +297,7 @@ public class LevelManager : MonoBehaviour
 
     public void ResumeAfterRevive()
     {
+        CrazySDK.Game.GameplayStart();
         isLevelFinished = false;
 
         if (spawner != null)

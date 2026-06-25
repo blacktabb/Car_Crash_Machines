@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
+using CrazyGames;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        SiteLock.Check();
 
         string currentVersion = Application.version;
         string savedVersion = PlayerPrefs.GetString("GameVersion", "");
@@ -98,6 +101,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGameLogic()
     {
+        CrazySDK.Game.GameplayStart();
         waitingForInput = false;
         isFirstLaunch = false;
 

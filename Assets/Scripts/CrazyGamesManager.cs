@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using CrazyGames;
 
 public class CrazyGamesManager : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class CrazyGamesManager : MonoBehaviour
 
     [SerializeField] public LevelRewardManager levelRewardManager;
     private string chosenReward;
+    private Action currentInterstitialCallback;
 
     private void Awake()
     {
@@ -18,17 +20,86 @@ public class CrazyGamesManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        CrazySDK.Init(() =>
+        {
+            Debug.Log("[CrazyGames] SDK Ready");
+        });
     }
 
     public void RewardedAdShow(string rewardID)
     {
         chosenReward = rewardID;
-        // No SDK active on this branch
+
+        CrazySDK.Ad.RequestAd(
+            CrazyAdType.Rewarded,
+            () =>
+            {
+                Time.timeScale = 0f;
+                if (AudioManager.Instance != null) AudioManager.Instance.SetSFXState(false);
+            },
+            (error) =>
+            {
+                Debug.Log("[CrazyGames] Rewarded ad error: " + error);
+                Time.timeScale = 1f;
+                if (AudioManager.Instance != null)
+                {
+                    bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                    AudioManager.Instance.SetSFXState(isSoundOn);
+                }
+            },
+            () =>
+            {
+                Time.timeScale = 1f;
+                if (AudioManager.Instance != null)
+                {
+                    bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                    AudioManager.Instance.SetSFXState(isSoundOn);
+                }
+                TakeReward();
+                if (VehicleStackManager.Instance != null && VehicleStackManager.Instance.gameOverPanel != null)
+                    VehicleStackManager.Instance.gameOverPanel.SetActive(false);
+                if (PerkManager.Instance != null && PerkManager.Instance.perkPanel != null)
+                    PerkManager.Instance.perkPanel.SetActive(false);
+            }
+        );
     }
 
     public void ShowMidgameAd(Action onComplete = null)
     {
-        onComplete?.Invoke();
+        currentInterstitialCallback = onComplete;
+
+        CrazySDK.Ad.RequestAd(
+            CrazyAdType.Midgame,
+            () =>
+            {
+                Time.timeScale = 0f;
+                if (AudioManager.Instance != null) AudioManager.Instance.SetSFXState(false);
+            },
+            (error) =>
+            {
+                Debug.Log("[CrazyGames] Midgame ad error: " + error);
+                Time.timeScale = 1f;
+                if (AudioManager.Instance != null)
+                {
+                    bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                    AudioManager.Instance.SetSFXState(isSoundOn);
+                }
+                currentInterstitialCallback?.Invoke();
+                currentInterstitialCallback = null;
+            },
+            () =>
+            {
+                Time.timeScale = 1f;
+                if (AudioManager.Instance != null)
+                {
+                    bool isSoundOn = PlayerPrefs.GetInt("Sound", 1) == 1;
+                    AudioManager.Instance.SetSFXState(isSoundOn);
+                }
+                currentInterstitialCallback?.Invoke();
+                currentInterstitialCallback = null;
+            }
+        );
     }
 
     void TakeReward()
